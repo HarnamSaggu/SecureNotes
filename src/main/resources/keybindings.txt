@@ -1,0 +1,19 @@
+<html>
+ <head>
+  <style>
+   .pre {
+    font-family: Fira Code Regular;
+    font-size: 9px;
+   }
+  </style>
+ </head>
+
+ <body>
+  <pre class = "pre">
+  TO DO ACTUALLY ADD keybindings
+
+
+  THANKS FUTURE HARNAM
+  </pre>
+ </body>
+</html>

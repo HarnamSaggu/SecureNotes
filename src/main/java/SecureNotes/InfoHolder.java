@@ -1,0 +1,7 @@
+package SecureNotes;
+
+public class InfoHolder {
+   public static String USERNAME;
+   public static char[] PASSWORD;
+   static boolean blockRequest = false;
+}
