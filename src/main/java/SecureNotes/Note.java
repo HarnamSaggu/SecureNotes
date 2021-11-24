@@ -14,6 +14,7 @@ public class Note implements Serializable {
    public Note(String title, String body, String filepath) {
       this.title = title;
       this.body = body;
+      this.password = "".toCharArray();
       this.filepath = filepath;
    }
 
