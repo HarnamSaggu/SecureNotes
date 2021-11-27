@@ -39,6 +39,7 @@ class ReEnterPasswordFrame extends EnterPasswordFrame {
                InfoHolder.blockRequest = true;
                InfoHolder.USERNAME = null;
                InfoHolder.PASSWORD = null;
+               InfoHolder.FILEPATH = null;
             }
             setErrorMsg("Invalid password");
          }

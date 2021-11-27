@@ -15,7 +15,8 @@ public class DBConnection {
    PreparedStatement updateTimeout = null;
    PreparedStatement selectTimeout = null;
    PreparedStatement nullTimeout = null;
-   ResultSet selectRS = null;
+   PreparedStatement selectFilepath = null;
+   ResultSet resultSet = null;
 
    public DBConnection() {
       if (InfoHolder.blockRequest) {
@@ -25,7 +26,6 @@ public class DBConnection {
       try {
          conn = DriverManager.getConnection(CONNECTION_STRING, USER, PASSWORD);
 
-//         select = conn.prepareStatement("SELECT username, hashed_password FROM users WHERE username = ?;");
          select = conn.prepareStatement("SELECT hashed_password FROM users WHERE username = ?;");
          insert = conn.prepareStatement("INSERT INTO users (username, hashed_password, filepath) VALUES (?, ?, ?);");
          update = conn.prepareStatement("UPDATE users SET username = ?, hashed_password = ?, filepath = ? WHERE username = ?;");
@@ -33,6 +33,7 @@ public class DBConnection {
          updateTimeout = conn.prepareStatement("UPDATE users SET timeout = ? WHERE username = ?;");
          selectTimeout = conn.prepareStatement("SELECT timeout FROM users WHERE username = ?;");
          nullTimeout = conn.prepareStatement("UPDATE users SET timeout = NULL WHERE username = ?;");
+         selectFilepath = conn.prepareStatement("SELECT filepath FROM users WHERE username = ?;");
       } catch (SQLException ex) {
          ex.printStackTrace();
          close();
@@ -45,8 +46,8 @@ public class DBConnection {
       }
 
       select.setString(1, a);
-      selectRS = select.executeQuery();
-      return selectRS;
+      resultSet = select.executeQuery();
+      return resultSet;
    }
 
    public void update(String a, String b, String c, String d) throws SQLException {
@@ -97,8 +98,8 @@ public class DBConnection {
       }
 
       selectTimeout.setString(1, a);
-      selectRS = selectTimeout.executeQuery();
-      return selectRS;
+      resultSet = selectTimeout.executeQuery();
+      return resultSet;
    }
 
    public void nullTimeout(String a) throws SQLException {
@@ -110,10 +111,20 @@ public class DBConnection {
       nullTimeout.executeUpdate();
    }
 
+   public ResultSet selectFilepath(String a) throws SQLException {
+      if (InfoHolder.blockRequest) {
+         return null;
+      }
+
+      selectFilepath.setString(1, a);
+      resultSet = selectFilepath.executeQuery();
+      return resultSet;
+   }
+
    public void close() {
       System.out.println("DELETE THIS - CLOSING CONNECTION");
       try {
-         selectRS.close();
+         resultSet.close();
       } catch (Exception e) { /* Ignored */ }
       try {
          select.close();
@@ -135,6 +146,9 @@ public class DBConnection {
       } catch (Exception e) { /* Ignored */ }
       try {
          nullTimeout.close();
+      } catch (Exception e) { /* Ignored */ }
+      try {
+         selectFilepath.close();
       } catch (Exception e) { /* Ignored */ }
       try {
          conn.close();

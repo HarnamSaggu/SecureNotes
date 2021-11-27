@@ -8,7 +8,6 @@ public class Note implements Serializable {
    String title;
    String body;
    char[] password;
-
    String filepath;
 
    public Note(String title, String body, String filepath) {
@@ -29,6 +28,12 @@ public class Note implements Serializable {
       this.body = body;
       this.password = password.toCharArray();
       this.filepath = filepath;
+   }
+
+   public Note(String title, String body, char[] password) {
+      this.title = title;
+      this.body = body;
+      this.password = password;
    }
 
    boolean hasPassword() {

@@ -132,6 +132,7 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
                            dbConnection.update(usernameStr, Crypt.hash(new String(passwordStr)), pathTextField.getText(), InfoHolder.USERNAME);
                            InfoHolder.USERNAME = usernameStr;
                            InfoHolder.PASSWORD = passwordStr;
+                           InfoHolder.FILEPATH = pathTextField.getText();
                            setMessage("Settings changed successfully");
                         } catch (SQLException e) {
                            e.printStackTrace();

@@ -8,10 +8,16 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 
 public class Main {
    public static void main(String[] args) throws IOException {
-//      new StartFrame();
+      new StartFrame();
+
+//      InfoHolder.USERNAME = "user";
+//      InfoHolder.PASSWORD = "password".toCharArray();
+//      Note note = new Note("Hello world", "Hello body", "password".toCharArray());
+//      NoteIO.write(note, "C:\\Users\\theto\\OneDrive\\Desktop\\bucket\\HelloWorld.scn");
 
 //      InfoHolder.USERNAME = "HELLO WORLD";
 //      InfoHolder.PASSWORD = "PASSWORD".toCharArray();

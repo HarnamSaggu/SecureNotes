@@ -14,10 +14,15 @@ public class NoteIO {
       s = Crypt.decrypt(s, new String(InfoHolder.PASSWORD));
       s = Crypt.decrypt(s, InfoHolder.USERNAME);
       byte[] data = Base64.getDecoder().decode(s);
-      ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
-      Object o  = ois.readObject();
-      ois.close();
-      return o;
+      try {
+         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+         Object o = ois.readObject();
+         ois.close();
+         return o;
+      } catch (EOFException e) {
+
+      }
+      return null;
    }
 
    public static String toString(Serializable o) throws IOException {
@@ -56,20 +61,62 @@ public class NoteIO {
    }
 
    public static List<Note> getAllFiles(String path) {
+//      File folder = new File(path);
+//      File[] listOfFiles = folder.listFiles();
+//      List<Note> allNotes = new ArrayList<>();
+
+//      if (listOfFiles == null) return new ArrayList<>();
+//
+//      for (int i = 0; i < Objects.requireNonNull(listOfFiles).length; i++) {
+//         String notePath = listOfFiles[i].getPath();
+//         if (listOfFiles[i].isFile() && notePath.endsWith(".scn")) {
+//            try {
+//               allNotes.add(read(notePath));
+//               System.out.println(allNotes.get(allNotes.size() - 1));
+//            } catch (Exception ignored) {}
+//         } else if (listOfFiles[i].isDirectory()) {
+//            allNotes.addAll(getAllFiles(listOfFiles[i].getPath()));
+//         }
+//      }
+//
+//      return allNotes;
+
+      List<Note> list = new ArrayList<>();
+
       File folder = new File(path);
       File[] listOfFiles = folder.listFiles();
-      List<Note> allNotes = new ArrayList<>();
 
-      for (int i = 0; i < Objects.requireNonNull(listOfFiles).length; i++) {
-         String notePath = listOfFiles[i].getPath();
-         if (listOfFiles[i].isFile() && notePath.endsWith(".scn")) {
-            try {
-               allNotes.add(read(notePath));
-               System.out.println(allNotes.get(allNotes.size() - 1));
-            } catch (NullPointerException ignored) {}
+      if (listOfFiles == null) return list;
+
+      for (int i = 0; i < listOfFiles.length; i++) {
+         if (listOfFiles[i].isDirectory()) {
+            list.addAll(getAllFiles(listOfFiles[i].getPath()));
+         } else if (listOfFiles[i].isFile() && listOfFiles[i].getPath().endsWith(".scn")) {
+            Note note = null;
+               note = read(listOfFiles[i].getPath());
+            if (note != null) list.add(note);
          }
       }
 
-      return allNotes;
+      return list;
+   }
+
+   static List<String> list(String path) {
+      List<String> list = new ArrayList<>();
+
+      File folder = new File(path);
+      File[] listOfFiles = folder.listFiles();
+
+      if (listOfFiles == null) return list;
+
+      for (int i = 0; i < listOfFiles.length; i++) {
+         if (listOfFiles[i].isDirectory()) {
+            list.addAll(list(listOfFiles[i].getPath()));
+         } else if (listOfFiles[i].isFile() && listOfFiles[i].getPath().endsWith(".scn")) {
+            list.add(listOfFiles[i].getPath());
+         }
+      }
+
+      return list;
    }
 }

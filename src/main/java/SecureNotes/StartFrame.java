@@ -122,9 +122,12 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
                   System.out.println(timeout);
 
                   if (timeout == null) {
-                     close();
                      InfoHolder.USERNAME = username;
                      InfoHolder.PASSWORD = password;
+                     resultSet = dbConnection.selectFilepath(username);
+                     resultSet.next();
+                     InfoHolder.FILEPATH = resultSet.getString(1);
+                     close();
                      new SecureNotes();
                   } else {
                      String currentDateTime = DateTime.getDateTime();
@@ -147,6 +150,9 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
                         close();
                         InfoHolder.USERNAME = username;
                         InfoHolder.PASSWORD = password;
+                        resultSet = dbConnection.selectFilepath(username);
+                        resultSet.next();
+                        InfoHolder.FILEPATH = resultSet.getString(1);
                         new SecureNotes();
                      } else {
                         setErrorMsg("You have been locked out: " + (45L - duration.toMinutes()) + " min(s)");
@@ -189,6 +195,7 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
          InfoHolder.blockRequest = true;
          InfoHolder.USERNAME = null;
          InfoHolder.PASSWORD = null;
+         InfoHolder.FILEPATH = null;
 
          errorMessageLabel.setText("You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
       }
