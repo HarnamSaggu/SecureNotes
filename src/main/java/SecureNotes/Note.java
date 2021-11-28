@@ -9,35 +9,13 @@ public class Note implements Serializable {
    String body;
    char[] password;
    String filepath;
-
-   public Note(String title, String body, String filepath) {
-      this.title = title;
-      this.body = body;
-      this.filepath = filepath;
-   }
+   String filename;
 
    public Note(String title, String body, char[] password, String filepath) {
       this.title = title;
       this.body = body;
       this.password = password;
       this.filepath = filepath;
-   }
-
-   public Note(String title, String body, String password, String filepath) {
-      this.title = title;
-      this.body = body;
-      this.password = password.toCharArray();
-      this.filepath = filepath;
-   }
-
-   public Note(String title, String body, char[] password) {
-      this.title = title;
-      this.body = body;
-      this.password = password;
-   }
-
-   boolean hasPassword() {
-      return password != null;
    }
 
    @Override
@@ -50,7 +28,8 @@ public class Note implements Serializable {
       if (!Objects.equals(title, note.title)) return false;
       if (!Objects.equals(body, note.body)) return false;
       if (!Arrays.equals(password, note.password)) return false;
-      return Objects.equals(filepath, note.filepath);
+      if (!Objects.equals(filepath, note.filepath)) return false;
+      return Objects.equals(filename, note.filename);
    }
 
    @Override
@@ -59,6 +38,7 @@ public class Note implements Serializable {
       result = 31 * result + (body != null ? body.hashCode() : 0);
       result = 31 * result + Arrays.hashCode(password);
       result = 31 * result + (filepath != null ? filepath.hashCode() : 0);
+      result = 31 * result + (filename != null ? filename.hashCode() : 0);
       return result;
    }
 
@@ -69,6 +49,7 @@ public class Note implements Serializable {
               ", body='" + body + '\'' +
               ", password=" + Arrays.toString(password) +
               ", filepath='" + filepath + '\'' +
+              ", filename='" + filename + '\'' +
               '}';
    }
 }

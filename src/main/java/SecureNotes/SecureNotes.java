@@ -333,13 +333,35 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       });
    }
 
-   void saveNote() {
-
-   }
-
    void createNote() {
       notes.add(new Note("[Untitled note]", "", (char[]) null, UserData.FILEPATH));
       titles.addElement("[Untitled note]");
+   }
+
+   void saveNote(int index) {
+      Note note = notes.get(index);
+
+      System.out.println(note);
+      note.title = titleBar.getText();
+      note.body = bodyPane.getText();
+      note.password = indvPasswordBar.getPassword();
+
+      String filepath = note.filepath == null ? UserData.FILEPATH : note.filepath;
+      String filename = note.filename == null ? note.title : note.filename;
+
+      System.out.println("uwu");
+
+      if (NoteIO.isTitleAvailible(filepath, filename)) {
+         note.filepath = filepath;
+         note.filename = filename;
+         NoteIO.write(note);
+         new TextDialog("File saved", "<html>Note: " + note.title + "<br> was saved at -<br>" + filepath + filename + ".scn</html>");
+      } else {
+
+      }
+
+      notes.set(index, note);
+      titles.setElementAt(note.title, ++index);
    }
 
    void deleteNote() {
@@ -390,7 +412,8 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       } else if (component == userSettings) {
          new EnterPasswordFrame(UserData.PASSWORD, () -> new ChangeUserSettingsFrame());
       } else if (component == save) {
-//         saveNote();
+         if (titleList.getSelectedIndex() == 0) return;
+         saveNote(titleList.getSelectedIndex() - 1);
       } else if (component == deleteUser) {
          new EnterPasswordFrame(UserData.PASSWORD, () -> new DeleteUserFrame());
       }

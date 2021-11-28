@@ -1,5 +1,7 @@
 package SecureNotes;
 
+import com.sun.security.jgss.GSSUtil;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -37,8 +39,26 @@ public class NoteIO {
       );
    }
 
-   public static void write(Note note, String path) {
-      try (BufferedWriter writer = Files.newBufferedWriter(Path.of(path), StandardCharsets.UTF_8)) {
+   public static boolean isTitleAvailible(String path, String name) {
+      File folder = new File(path);
+      File[] listOfFiles = folder.listFiles();
+
+      if (listOfFiles == null) return false;
+
+      for (File listOfFile : listOfFiles) {
+         if (listOfFile.getName().equals(name + ".scn")) {
+            return false;
+         }
+      }
+
+      return true;
+   }
+
+   public static void write(Note note) {//, String path, String name) {
+//      try (BufferedWriter writer = Files.newBufferedWriter(Path.of(path + name + ".scn"), StandardCharsets.UTF_8)) {
+      try (BufferedWriter writer = Files.newBufferedWriter(Path.of(note.filepath + note.filename + ".scn"), StandardCharsets.UTF_8)) {
+//         note.filepath = path;
+//         note.filename = name;
          writer.write(toString(note));
       } catch (IOException ex) {
          ex.printStackTrace();
