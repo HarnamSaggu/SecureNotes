@@ -128,9 +128,9 @@ public class CreateUserFrame extends JPanel implements ActionListener, KeyListen
                            try {
                               dbConnection.insert(usernameStr, Crypt.hash(new String(passwordStr)), path.getText());
                               close();
-                              InfoHolder.USERNAME = usernameStr;
-                              InfoHolder.PASSWORD = passwordStr;
-                              InfoHolder.FILEPATH = path.getText();
+                              UserData.USERNAME = usernameStr;
+                              UserData.PASSWORD = passwordStr;
+                              UserData.FILEPATH = path.getText();
                               new SecureNotes();
                            } catch (SQLException e) {
                               e.printStackTrace();

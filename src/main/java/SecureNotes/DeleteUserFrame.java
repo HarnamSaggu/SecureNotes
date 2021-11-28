@@ -72,13 +72,13 @@ public class DeleteUserFrame extends JPanel implements ActionListener {
    @Override
    public void actionPerformed(ActionEvent e) {
       if (e.getSource() == yes) {
-         if (InfoHolder.blockRequest) {
+         if (UserData.blockRequest) {
             JOptionPane.showMessageDialog(jFrame, "Your account has already been deleted");
          }
 
          try {
-            dbConnection.delete(InfoHolder.USERNAME);
-            InfoHolder.blockRequest = true;
+            dbConnection.delete(UserData.USERNAME);
+            UserData.blockRequest = true;
             close();
          } catch (SQLException ex) {
             ex.printStackTrace();

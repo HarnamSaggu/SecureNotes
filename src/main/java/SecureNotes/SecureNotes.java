@@ -204,6 +204,20 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       jFrame.setLocationRelativeTo(null);
       jFrame.setVisible(true);
 
+//      UserData.lockedOutEvent = () -> {
+//         about.setEnabled(false);
+//         bodyPane.setEnabled(false);
+//         deleteNote.setEnabled(false);
+//         deleteUser.setEnabled(false);
+//         indvPasswordBar.setEnabled(false);
+//         keybindings.setEnabled(false);
+//         newNote.setEnabled(false);
+//         save.setEnabled(false);
+//         saveAs.setEnabled(false);
+//         titleBar.setEnabled(false);
+//         userSettings.setEnabled(false);
+//      };
+
 //      if (titles.size() <= 1)
 //         createNewNote();
 
@@ -212,9 +226,8 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       new SwingWorker<>() {
          @Override
          protected Object doInBackground() {
-            List<Note> toAdd = NoteIO.getAllFiles(InfoHolder.FILEPATH);
-            for (int i = 0; i < toAdd.size(); i++) {
-               Note note = toAdd.get(i);
+            List<Note> toAdd = NoteIO.getAllFiles(UserData.FILEPATH);
+            for (Note note : toAdd) {
                titles.addElement(note.title);
                notes.add(note);
             }
@@ -313,7 +326,7 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
          return;
       }
 
-      new NotePasswordFrame(password, () -> {
+      new EnterPasswordFrame(password, () -> {
          titleBar.setText(title);
          bodyPane.setText(body);
          indvPasswordBar.setText(new String(password));
@@ -325,7 +338,7 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
    }
 
    void createNote() {
-      notes.add(new Note("[Untitled note]", "", (char[]) null, InfoHolder.FILEPATH));
+      notes.add(new Note("[Untitled note]", "", (char[]) null, UserData.FILEPATH));
       titles.addElement("[Untitled note]");
    }
 
@@ -375,11 +388,11 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
          }
          new TextDialog("About", aboutFile.toString());
       } else if (component == userSettings) {
-         new ReEnterPasswordFrame("userSettings");
+         new EnterPasswordFrame(UserData.PASSWORD, () -> new ChangeUserSettingsFrame());
       } else if (component == save) {
 //         saveNote();
       } else if (component == deleteUser) {
-         new ReEnterPasswordFrame("deleteUser");
+         new EnterPasswordFrame(UserData.PASSWORD, () -> new DeleteUserFrame());
       }
    }
 

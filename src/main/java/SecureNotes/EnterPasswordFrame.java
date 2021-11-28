@@ -2,17 +2,20 @@ package SecureNotes;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.Arrays;
 
 public class EnterPasswordFrame extends JPanel implements ActionListener, KeyListener {
    JFrame jFrame;
-   JButton login;
-   JPasswordField password;
-   JLabel errorMessage;
+   JButton loginButton;
+   JPasswordField passwordField;
 
-   DBConnection dbConnection;
+   final char[] password;
+   final PasswordEvent event;
 
-   public EnterPasswordFrame() {
+   public EnterPasswordFrame(char[] password, PasswordEvent event) {
       super();
+      this.password = password;
+      this.event = event;
       initComponents();
    }
 
@@ -40,29 +43,26 @@ public class EnterPasswordFrame extends JPanel implements ActionListener, KeyLis
       l1.setBounds(10, 10, 150, 20);
       add(l1);
 
-      password = new JPasswordField();
-      password.setFont(Constants.FONT);
-      password.setBounds(80, 11, 495, 18);
-      password.addKeyListener(this);
-      add(password);
+      passwordField = new JPasswordField();
+      passwordField.setFont(Constants.FONT);
+      passwordField.setBounds(80, 11, 495, 18);
+      passwordField.addKeyListener(this);
+      add(passwordField);
 
-      login = new JButton("Login");
-      login.setFont(Constants.FONT);
-      login.setBounds(10, 31, 564, 18);
-      login.setBackground(Constants.BUTTON_COLOR);
-      login.addActionListener(this);
-      login.addKeyListener(this);
-      add(login);
+      loginButton = new JButton("Login");
+      loginButton.setFont(Constants.FONT);
+      loginButton.setBounds(10, 31, 564, 18);
+      loginButton.setBackground(Constants.BUTTON_COLOR);
+      loginButton.addActionListener(this);
+      loginButton.addKeyListener(this);
+      add(loginButton);
 
-//      dbConnection = new DBConnection();
+      jFrame.setVisible(true);
    }
 
    public void close() {
       if (jFrame != null) {
          jFrame.dispose();
-      }
-      if (dbConnection != null) {
-         dbConnection.close();
       }
    }
 
@@ -72,22 +72,12 @@ public class EnterPasswordFrame extends JPanel implements ActionListener, KeyLis
    }
 
    void checkDetails() {
-
-   }
-
-   void setErrorMsg(String msg) {
-      password.setText("");
-
-      if (errorMessage == null) {
-         errorMessage = new JLabel();
-         errorMessage.setFont(Constants.FONT);
-         errorMessage.setBounds(10, 31, 564, 18);
-         add(errorMessage);
-         login.setBounds(10, 51, 564, 18);
-         jFrame.setSize(600, 115);
+      if (Arrays.equals(password, passwordField.getPassword())) {
+         event.ifCorrect();
+      } else {
+         UserData.incrementStrikes();
       }
-
-      errorMessage.setText(msg);
+      close();
    }
 
    @Override

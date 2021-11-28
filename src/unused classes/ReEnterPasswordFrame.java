@@ -22,7 +22,7 @@ class ReEnterPasswordFrame extends EnterPasswordFrame {
          return;
       }
       try {
-         ResultSet resultSet = dbConnection.select(InfoHolder.USERNAME);
+         ResultSet resultSet = dbConnection.select(UserData.USERNAME);
          resultSet.next();
          String returnedPassword = resultSet.getString("hashed_password");
          if (Crypt.hashMatches(new String(passwordStr), returnedPassword)) {
@@ -35,11 +35,11 @@ class ReEnterPasswordFrame extends EnterPasswordFrame {
          } else {
             count++;
             if (count == 3) {
-               dbConnection.updateTimeout(DateTime.getDateTime(), InfoHolder.USERNAME);
-               InfoHolder.blockRequest = true;
-               InfoHolder.USERNAME = null;
-               InfoHolder.PASSWORD = null;
-               InfoHolder.FILEPATH = null;
+               dbConnection.updateTimeout(DateTime.getDateTime(), UserData.USERNAME);
+               UserData.blockRequest = true;
+               UserData.USERNAME = null;
+               UserData.PASSWORD = null;
+               UserData.FILEPATH = null;
             }
             setErrorMsg("Invalid password");
          }

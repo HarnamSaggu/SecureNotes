@@ -19,7 +19,7 @@ public class DBConnection {
    ResultSet resultSet = null;
 
    public DBConnection() {
-      if (InfoHolder.blockRequest) {
+      if (UserData.blockRequest) {
          return;
       }
 
@@ -41,7 +41,7 @@ public class DBConnection {
    }
 
    public ResultSet select(String a) throws SQLException {
-      if (InfoHolder.blockRequest) {
+      if (UserData.blockRequest) {
          return null;
       }
 
@@ -51,7 +51,7 @@ public class DBConnection {
    }
 
    public void update(String a, String b, String c, String d) throws SQLException {
-      if (InfoHolder.blockRequest) {
+      if (UserData.blockRequest) {
          return;
       }
 
@@ -63,7 +63,7 @@ public class DBConnection {
    }
 
    public void insert(String a, String b, String c) throws SQLException {
-      if (InfoHolder.blockRequest) {
+      if (UserData.blockRequest) {
          return;
       }
 
@@ -74,7 +74,7 @@ public class DBConnection {
    }
 
    public void delete(String a) throws SQLException {
-      if (InfoHolder.blockRequest) {
+      if (UserData.blockRequest) {
          return;
       }
 
@@ -83,7 +83,7 @@ public class DBConnection {
    }
 
    public void updateTimeout(String a, String b) throws SQLException {
-      if (InfoHolder.blockRequest) {
+      if (UserData.blockRequest) {
          return;
       }
 
@@ -93,7 +93,7 @@ public class DBConnection {
    }
 
    public ResultSet selectTimeout(String a) throws SQLException {
-      if (InfoHolder.blockRequest) {
+      if (UserData.blockRequest) {
          return null;
       }
 
@@ -103,7 +103,7 @@ public class DBConnection {
    }
 
    public void nullTimeout(String a) throws SQLException {
-      if (InfoHolder.blockRequest) {
+      if (UserData.blockRequest) {
          return;
       }
 
@@ -112,7 +112,7 @@ public class DBConnection {
    }
 
    public ResultSet selectFilepath(String a) throws SQLException {
-      if (InfoHolder.blockRequest) {
+      if (UserData.blockRequest) {
          return null;
       }
 

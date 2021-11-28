@@ -120,8 +120,8 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
                if (folder.exists() && folder.isDirectory()) {
                   try {
                      ResultSet resultSet = dbConnection.select(usernameStr);
-                     System.out.println(InfoHolder.USERNAME + ", " + usernameStr + ", " + InfoHolder.USERNAME.equals(usernameStr));
-                     if (usernameStr.equals(InfoHolder.USERNAME)) resultSet.next();
+                     System.out.println(UserData.USERNAME + ", " + usernameStr + ", " + UserData.USERNAME.equals(usernameStr));
+                     if (usernameStr.equals(UserData.USERNAME)) resultSet.next();
                      if (!resultSet.next()) {
                         System.out.println(usernameStr);
                         System.out.println(passwordStr);
@@ -129,10 +129,10 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
                         System.out.println();
 
                         try {
-                           dbConnection.update(usernameStr, Crypt.hash(new String(passwordStr)), pathTextField.getText(), InfoHolder.USERNAME);
-                           InfoHolder.USERNAME = usernameStr;
-                           InfoHolder.PASSWORD = passwordStr;
-                           InfoHolder.FILEPATH = pathTextField.getText();
+                           dbConnection.update(usernameStr, Crypt.hash(new String(passwordStr)), pathTextField.getText(), UserData.USERNAME);
+                           UserData.USERNAME = usernameStr;
+                           UserData.PASSWORD = passwordStr;
+                           UserData.FILEPATH = pathTextField.getText();
                            setMessage("Settings changed successfully");
                         } catch (SQLException e) {
                            e.printStackTrace();

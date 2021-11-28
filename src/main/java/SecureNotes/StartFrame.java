@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 public class StartFrame extends JPanel implements ActionListener, KeyListener {
    JFrame jFrame;
@@ -122,13 +123,14 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
                   System.out.println(timeout);
 
                   if (timeout == null) {
-                     InfoHolder.USERNAME = username;
-                     InfoHolder.PASSWORD = password;
+                     UserData.USERNAME = username;
+                     UserData.PASSWORD = password;
                      resultSet = dbConnection.selectFilepath(username);
-                     resultSet.next();
-                     InfoHolder.FILEPATH = resultSet.getString(1);
-                     close();
-                     new SecureNotes();
+                     if (resultSet.next()) {
+                        UserData.FILEPATH = resultSet.getString(1);
+                        close();
+                        new SecureNotes();
+                     }
                   } else {
                      String currentDateTime = DateTime.getDateTime();
                      System.out.println(currentDateTime);
@@ -141,21 +143,27 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
                      System.out.println(localTimeout);
                      System.out.println(localCurrent);
 
-                     Duration duration = Duration.between(localTimeout, localCurrent);
-                     System.out.println(duration.toMinutes());
+//                     Duration duration = Duration.between(localTimeout, localCurrent);
+//                     long minutesSince = duration.toMinutes();
 
-                     if (duration.toMinutes() >= Constants.TIMEOUT_DURATION) {
+//                     long minutesSince = localCurrent.getMinute() - localTimeout.getMinute();
+
+                     long minutesSince = ChronoUnit.MINUTES.between(localTimeout, localCurrent);
+
+                     System.out.println(minutesSince);
+
+                     if (minutesSince >= Constants.TIMEOUT_DURATION) {
                         dbConnection.nullTimeout(username);
 
-                        close();
-                        InfoHolder.USERNAME = username;
-                        InfoHolder.PASSWORD = password;
+                        UserData.USERNAME = username;
+                        UserData.PASSWORD = password;
                         resultSet = dbConnection.selectFilepath(username);
                         resultSet.next();
-                        InfoHolder.FILEPATH = resultSet.getString(1);
+                        UserData.FILEPATH = resultSet.getString(1);
+                        close();
                         new SecureNotes();
                      } else {
-                        setErrorMsg("You have been locked out: " + (45L - duration.toMinutes()) + " min(s)");
+                        setErrorMsg("You have been locked out: " + (45L - minutesSince) + " min(s)");
                      }
                   }
                }
@@ -188,14 +196,14 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
 
       if (failCount == 3) {
          try {
-            dbConnection.updateTimeout(DateTime.getDateTime(), InfoHolder.USERNAME);
+            dbConnection.updateTimeout(DateTime.getDateTime(), UserData.USERNAME);
          } catch (SQLException e) {
             e.printStackTrace();
          }
-         InfoHolder.blockRequest = true;
-         InfoHolder.USERNAME = null;
-         InfoHolder.PASSWORD = null;
-         InfoHolder.FILEPATH = null;
+         UserData.blockRequest = true;
+         UserData.USERNAME = null;
+         UserData.PASSWORD = null;
+         UserData.FILEPATH = null;
 
          errorMessageLabel.setText("You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
       }

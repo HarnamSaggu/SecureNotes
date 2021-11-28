@@ -7,19 +7,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
 
 public class NoteIO {
    public static Object fromString(String s) throws IOException, ClassNotFoundException {
-      s = Crypt.decrypt(s, new String(InfoHolder.PASSWORD));
-      s = Crypt.decrypt(s, InfoHolder.USERNAME);
+      s = Crypt.decrypt(s, new String(UserData.PASSWORD));
+      s = Crypt.decrypt(s, UserData.USERNAME);
       byte[] data = Base64.getDecoder().decode(s);
       try {
          ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
          Object o = ois.readObject();
          ois.close();
          return o;
-      } catch (EOFException e) {
+      } catch (EOFException ignored) {
 
       }
       return null;
@@ -32,9 +31,9 @@ public class NoteIO {
       oos.close();
       return Crypt.encrypt(
               Crypt.encrypt(
-                      Base64.getEncoder().encodeToString(baos.toByteArray()), InfoHolder.USERNAME
+                      Base64.getEncoder().encodeToString(baos.toByteArray()), UserData.USERNAME
               ),
-              new String(InfoHolder.PASSWORD)
+              new String(UserData.PASSWORD)
       );
    }
 
@@ -88,12 +87,12 @@ public class NoteIO {
 
       if (listOfFiles == null) return list;
 
-      for (int i = 0; i < listOfFiles.length; i++) {
-         if (listOfFiles[i].isDirectory()) {
-            list.addAll(getAllFiles(listOfFiles[i].getPath()));
-         } else if (listOfFiles[i].isFile() && listOfFiles[i].getPath().endsWith(".scn")) {
-            Note note = null;
-               note = read(listOfFiles[i].getPath());
+      for (File listOfFile : listOfFiles) {
+         if (listOfFile.isDirectory()) {
+            list.addAll(getAllFiles(listOfFile.getPath()));
+         } else if (listOfFile.isFile() && listOfFile.getPath().endsWith(".scn")) {
+            Note note;
+            note = read(listOfFile.getPath());
             if (note != null) list.add(note);
          }
       }
@@ -109,11 +108,11 @@ public class NoteIO {
 
       if (listOfFiles == null) return list;
 
-      for (int i = 0; i < listOfFiles.length; i++) {
-         if (listOfFiles[i].isDirectory()) {
-            list.addAll(list(listOfFiles[i].getPath()));
-         } else if (listOfFiles[i].isFile() && listOfFiles[i].getPath().endsWith(".scn")) {
-            list.add(listOfFiles[i].getPath());
+      for (File listOfFile : listOfFiles) {
+         if (listOfFile.isDirectory()) {
+            list.addAll(list(listOfFile.getPath()));
+         } else if (listOfFile.isFile() && listOfFile.getPath().endsWith(".scn")) {
+            list.add(listOfFile.getPath());
          }
       }
 
