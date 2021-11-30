@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -113,7 +112,7 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
          return;
       }
       try {
-         ResultSet resultSet = dbConnection.select(username);
+         ResultSet resultSet = dbConnection.selectUser(username);
          if (resultSet.next()) {
             String returnedPassword = resultSet.getString("hashed_password");
             if (Crypt.hashMatches(new String(password), returnedPassword)) {
@@ -123,14 +122,10 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
                   System.out.println(timeout);
 
                   if (timeout == null) {
-                     UserData.USERNAME = username;
-                     UserData.PASSWORD = password;
-                     resultSet = dbConnection.selectFilepath(username);
-                     if (resultSet.next()) {
-                        UserData.FILEPATH = resultSet.getString(1);
+                     UserData.username = username;
+                     UserData.password = password;
                         close();
                         new SecureNotes();
-                     }
                   } else {
                      String currentDateTime = DateTime.getDateTime();
                      System.out.println(currentDateTime);
@@ -153,13 +148,10 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
                      System.out.println(minutesSince);
 
                      if (minutesSince >= Constants.TIMEOUT_DURATION) {
-                        dbConnection.nullTimeout(username);
+                        dbConnection.nullifyTimeout(username);
 
-                        UserData.USERNAME = username;
-                        UserData.PASSWORD = password;
-                        resultSet = dbConnection.selectFilepath(username);
-                        resultSet.next();
-                        UserData.FILEPATH = resultSet.getString(1);
+                        UserData.username = username;
+                        UserData.password = password;
                         close();
                         new SecureNotes();
                      } else {
@@ -196,14 +188,13 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
 
       if (failCount == 3) {
          try {
-            dbConnection.updateTimeout(DateTime.getDateTime(), UserData.USERNAME);
+            dbConnection.updateTimeout(DateTime.getDateTime(), UserData.username);
          } catch (SQLException e) {
             e.printStackTrace();
          }
          UserData.blockRequest = true;
-         UserData.USERNAME = null;
-         UserData.PASSWORD = null;
-         UserData.FILEPATH = null;
+         UserData.username = null;
+         UserData.password = null;
 
          errorMessageLabel.setText("You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
       }

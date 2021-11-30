@@ -8,15 +8,19 @@ public class DBConnection {
    static final String PASSWORD = "password";
 
    Connection conn = null;
-   PreparedStatement select = null;
-   PreparedStatement insert = null;
-   PreparedStatement update = null;
-   PreparedStatement delete = null;
+   ResultSet resultSet = null;
+
+   PreparedStatement selectPassword = null;
+   PreparedStatement insertUser = null;
+   PreparedStatement updateUser = null;
+   PreparedStatement deleteUser = null;
    PreparedStatement updateTimeout = null;
    PreparedStatement selectTimeout = null;
-   PreparedStatement nullTimeout = null;
-   PreparedStatement selectFilepath = null;
-   ResultSet resultSet = null;
+   PreparedStatement nullifyTimeout = null;
+   PreparedStatement selectNotes = null;
+   PreparedStatement insertNote = null;
+   PreparedStatement updateNote = null;
+   PreparedStatement selectId = null;
 
    public DBConnection() {
       if (UserData.blockRequest) {
@@ -26,60 +30,63 @@ public class DBConnection {
       try {
          conn = DriverManager.getConnection(CONNECTION_STRING, USER, PASSWORD);
 
-         select = conn.prepareStatement("SELECT hashed_password FROM users WHERE username = ?;");
-         insert = conn.prepareStatement("INSERT INTO users (username, hashed_password, filepath) VALUES (?, ?, ?);");
-         update = conn.prepareStatement("UPDATE users SET username = ?, hashed_password = ?, filepath = ? WHERE username = ?;");
-         delete = conn.prepareStatement("DELETE FROM users WHERE username = ?;");
+         selectPassword = conn.prepareStatement("SELECT hashed_password FROM users WHERE username = ?;");
+         insertUser = conn.prepareStatement("INSERT INTO users (username, hashed_password, filepath) VALUES (?, ?, ?);");
+         updateUser = conn.prepareStatement("UPDATE users SET username = ?, hashed_password = ?, filepath = ? WHERE username = ?;");
+         deleteUser = conn.prepareStatement("DELETE FROM users WHERE username = ?;");
          updateTimeout = conn.prepareStatement("UPDATE users SET timeout = ? WHERE username = ?;");
          selectTimeout = conn.prepareStatement("SELECT timeout FROM users WHERE username = ?;");
-         nullTimeout = conn.prepareStatement("UPDATE users SET timeout = NULL WHERE username = ?;");
-         selectFilepath = conn.prepareStatement("SELECT filepath FROM users WHERE username = ?;");
+         nullifyTimeout = conn.prepareStatement("UPDATE users SET timeout = NULL WHERE username = ?;");
+         selectNotes = conn.prepareStatement("SELECT id, title, body, password FROM notes WHERE username = ?;");
+         insertNote = conn.prepareStatement("INSERT INTO notes (username, title, body, password) VALUES (?, ?, ?, ?);");
+         updateNote = conn.prepareStatement("UPDATE notes SET username = ?, title = ?, body = ?, password = ? WHERE id = ?;");
+         selectId = conn.prepareStatement("SELECT id FROM notes WHERE username = ?;");
       } catch (SQLException ex) {
          ex.printStackTrace();
          close();
       }
    }
 
-   public ResultSet select(String a) throws SQLException {
+   public ResultSet selectUser(String a) throws SQLException {
       if (UserData.blockRequest) {
          return null;
       }
 
-      select.setString(1, a);
-      resultSet = select.executeQuery();
+      selectPassword.setString(1, a);
+      resultSet = selectPassword.executeQuery();
       return resultSet;
    }
 
-   public void update(String a, String b, String c, String d) throws SQLException {
+   public void updateUser(String a, String b, String c, String d) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
 
-      update.setString(1, a);
-      update.setString(2, b);
-      update.setString(3, c);
-      update.setString(4, d);
-      update.executeUpdate();
+      updateUser.setString(1, a);
+      updateUser.setString(2, b);
+      updateUser.setString(3, c);
+      updateUser.setString(4, d);
+      updateUser.executeUpdate();
    }
 
-   public void insert(String a, String b, String c) throws SQLException {
+   public void insertUser(String a, String b, String c) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
 
-      insert.setString(1, a);
-      insert.setString(2, b);
-      insert.setString(3, c);
-      insert.executeUpdate();
+      insertUser.setString(1, a);
+      insertUser.setString(2, b);
+      insertUser.setString(3, c);
+      insertUser.executeUpdate();
    }
 
-   public void delete(String a) throws SQLException {
+   public void deleteUser(String a) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
 
-      delete.setString(1, a);
-      delete.executeUpdate();
+      deleteUser.setString(1, a);
+      deleteUser.executeUpdate();
    }
 
    public void updateTimeout(String a, String b) throws SQLException {
@@ -102,22 +109,57 @@ public class DBConnection {
       return resultSet;
    }
 
-   public void nullTimeout(String a) throws SQLException {
+   public void nullifyTimeout(String a) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
 
-      nullTimeout.setString(1, a);
-      nullTimeout.executeUpdate();
+      nullifyTimeout.setString(1, a);
+      nullifyTimeout.executeUpdate();
    }
 
-   public ResultSet selectFilepath(String a) throws SQLException {
+   public ResultSet selectNotes(String a) throws SQLException {
       if (UserData.blockRequest) {
          return null;
       }
 
-      selectFilepath.setString(1, a);
-      resultSet = selectFilepath.executeQuery();
+      selectNotes.setString(1, a);
+      resultSet = selectNotes.executeQuery();
+      return resultSet;
+   }
+
+   public void insertNote(String a, String b, String c, String d) throws SQLException {
+      if (UserData.blockRequest) {
+         return;
+      }
+
+      insertNote.setString(1, a);
+      insertNote.setString(2, b);
+      insertNote.setString(3, c);
+      insertNote.setString(4, d);
+      insertNote.executeUpdate();
+   }
+
+   public void updateNote(String a, String b, String c, String d, int e) throws SQLException {
+      if (UserData.blockRequest) {
+         return;
+      }
+
+      updateNote.setString(1, a);
+      updateNote.setString(2, b);
+      updateNote.setString(3, c);
+      updateNote.setString(4, d);
+      updateNote.setInt(5, e);
+      updateNote.executeUpdate();
+   }
+
+   public ResultSet selectId(String a) throws SQLException {
+      if (UserData.blockRequest) {
+         return null;
+      }
+
+      selectId.setString(1, a);
+      resultSet = selectId.executeQuery();
       return resultSet;
    }
 
@@ -127,16 +169,16 @@ public class DBConnection {
          resultSet.close();
       } catch (Exception e) { /* Ignored */ }
       try {
-         select.close();
+         selectPassword.close();
       } catch (Exception e) { /* Ignored */ }
       try {
-         insert.close();
+         insertUser.close();
       } catch (Exception e) { /* Ignored */ }
       try {
-         update.close();
+         updateUser.close();
       } catch (Exception e) { /* Ignored */ }
       try {
-         delete.close();
+         deleteUser.close();
       } catch (Exception e) { /* Ignored */ }
       try {
          updateTimeout.close();
@@ -145,10 +187,19 @@ public class DBConnection {
          selectTimeout.close();
       } catch (Exception e) { /* Ignored */ }
       try {
-         nullTimeout.close();
+         nullifyTimeout.close();
       } catch (Exception e) { /* Ignored */ }
       try {
-         selectFilepath.close();
+         selectNotes.close();
+      } catch (Exception e) { /* Ignored */ }
+      try {
+         insertNote.close();
+      } catch (Exception e) { /* Ignored */ }
+      try {
+         updateNote.close();
+      } catch (Exception e) { /* Ignored */ }
+      try {
+         selectId.close();
       } catch (Exception e) { /* Ignored */ }
       try {
          conn.close();

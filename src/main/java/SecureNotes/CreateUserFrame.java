@@ -117,7 +117,7 @@ public class CreateUserFrame extends JPanel implements ActionListener, KeyListen
                   File folder = new File(path.getText());
                   if (folder.exists() && folder.isDirectory()) {
                      try {
-                        ResultSet resultSet = dbConnection.select(usernameStr);
+                        ResultSet resultSet = dbConnection.selectUser(usernameStr);
                         if (!resultSet.next()) {
                            System.out.println(usernameStr);
                            System.out.println(passwordStr);
@@ -126,11 +126,10 @@ public class CreateUserFrame extends JPanel implements ActionListener, KeyListen
                            System.out.println();
 
                            try {
-                              dbConnection.insert(usernameStr, Crypt.hash(new String(passwordStr)), path.getText());
+                              dbConnection.insertUser(usernameStr, Crypt.hash(new String(passwordStr)), path.getText());
                               close();
-                              UserData.USERNAME = usernameStr;
-                              UserData.PASSWORD = passwordStr;
-                              UserData.FILEPATH = path.getText();
+                              UserData.username = usernameStr;
+                              UserData.password = passwordStr;
                               new SecureNotes();
                            } catch (SQLException e) {
                               e.printStackTrace();

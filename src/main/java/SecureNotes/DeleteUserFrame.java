@@ -77,7 +77,7 @@ public class DeleteUserFrame extends JPanel implements ActionListener {
          }
 
          try {
-            dbConnection.delete(UserData.USERNAME);
+            dbConnection.deleteUser(UserData.username);
             UserData.blockRequest = true;
             close();
          } catch (SQLException ex) {
