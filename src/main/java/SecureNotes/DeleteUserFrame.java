@@ -7,16 +7,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 
-public class DeleteUserFrame extends JPanel implements ActionListener {
+class DeleteUserFrame extends JPanel implements ActionListener {
+   final CallbackEvent callbackEvent;
    JFrame jFrame;
    JLabel msg;
    JButton yes, no;
-
    DBConnection dbConnection;
 
-   CallbackEvent callbackEvent;
-
-   public DeleteUserFrame(CallbackEvent callbackEvent) {
+   DeleteUserFrame(CallbackEvent callbackEvent) {
       super();
       this.callbackEvent = callbackEvent;
       initComponents();
@@ -65,7 +63,7 @@ public class DeleteUserFrame extends JPanel implements ActionListener {
       jFrame.setVisible(true);
    }
 
-   public void close() {
+   void close() {
       if (jFrame != null) {
          jFrame.dispose();
          dbConnection.close();

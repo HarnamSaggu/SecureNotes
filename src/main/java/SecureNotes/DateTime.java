@@ -12,8 +12,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-public class DateTime {
-   public static String getDateTime() {
+class DateTime {
+   static String getDateTime() {
       try {
          NTPUDPClient timeClient = new NTPUDPClient();
          InetAddress inetAddress = InetAddress.getByName("time-a.nist.gov");

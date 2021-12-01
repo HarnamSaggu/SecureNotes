@@ -4,15 +4,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserData {
-   static final int MAX_ATTEMPT = 7;
-
+class UserData {
+   static final List<CallbackEvent> callbackEvents = new ArrayList<>();
    static String username;
    static char[] password;
    static boolean blockRequest = false;
    static int strikes = 0;
-
-   static List<CallbackEvent> callbackEvents = new ArrayList<>();
 
    static void addCallbackEvent(CallbackEvent callbackEvent) {
       callbackEvents.add(callbackEvent);
@@ -25,7 +22,7 @@ public class UserData {
    static void incrementStrikes() {
       strikes++;
 
-      if (strikes == MAX_ATTEMPT) {
+      if (strikes == Constants.MAX_ATTEMPT) {
          block();
       }
    }

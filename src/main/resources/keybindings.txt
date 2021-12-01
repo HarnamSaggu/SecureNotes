@@ -1,19 +1,15 @@
 <html>
- <head>
-  <style>
-   .pre {
-    font-family: Fira Code Regular;
-    font-size: 9px;
-   }
-  </style>
- </head>
-
- <body>
-  <pre class = "pre">
-  TO DO ACTUALLY ADD keybindings
-
-
-  THANKS FUTURE HARNAM
-  </pre>
- </body>
+	Keybindings:<br>
+	<hr><br>
+	For note management - Alt+F
+	<br>&#9New Note - Alt+N
+	<br>&#9Delete note - Alt+D
+	<br>
+	For help - Alt+H
+	<br>&#9Keybindings - Alt+K
+	<br>&#9About - Alt+A
+	<br>
+	For settings - Alt+S
+	<br>&#9Change user settings - Alt+C
+	<br>&#9Delete user - Alt+D
 </html>

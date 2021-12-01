@@ -1,5 +1,5 @@
 package SecureNotes;
 
-public interface CallbackEvent {
+interface CallbackEvent {
    void doEvent();
 }

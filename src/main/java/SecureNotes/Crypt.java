@@ -10,22 +10,22 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 
-public class Crypt {
-   public static String hash(String password) {
+class Crypt {
+   static String hash(String password) {
       return SCryptUtil.scrypt(password, 16, 16, 16);
    }
 
-   public static boolean hashMatches(String newPassword, String hashPassword) {
+   static boolean hashMatches(String newPassword, String hashPassword) {
       return SCryptUtil.check(newPassword, hashPassword);
    }
 
-   public static String encrypt(String strToEncrypt, String secret) {
+   static String encrypt(String strToEncrypt, char[] secret) {
       try {
          SecretKeySpec secretKey = null;
          byte[] key;
          MessageDigest sha;
          try {
-            key = secret.getBytes(StandardCharsets.UTF_8);
+            key = new String(secret).getBytes(StandardCharsets.UTF_8);
             sha = MessageDigest.getInstance("SHA-1");
             key = sha.digest(key);
             key = Arrays.copyOf(key, 16);
@@ -42,7 +42,7 @@ public class Crypt {
       return null;
    }
 
-   public static String decrypt(String strToDecrypt, String secret) {
+   static String decrypt(String strToDecrypt, String secret) {
       try {
          SecretKeySpec secretKey = null;
          byte[] key;

@@ -12,6 +12,7 @@ class Constants {
    static final Font FONT = new Font("Fira Code Regular", Font.PLAIN, 12);
    static final Font BOLD_FONT = new Font("Fira Code Regular", Font.BOLD, 13);
    static final long TIMEOUT_DURATION = 45L;
+   static final int MAX_ATTEMPT = 7;
 
    static {
       try {

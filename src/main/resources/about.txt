@@ -1,19 +1,16 @@
 <html>
- <head>
-  <style>
-   .pre {
-    font-family: Fira Code Regular;
-    font-size: 9px;
-   }
-  </style>
- </head>
-
- <body>
-  <pre class = "pre">
-  TO DO ACTUALLY ADD about
-
-
-  THANKS FUTURE HARNAM
-  </pre>
- </body>
+	Secure notes:<br>
+	<hr><br>
+	This is an encrypted note-taking application.
+	<br>
+	You can whatever note you want, then have it further encrypted by AES.
+	<br>
+	Notes consist of a title, body and optional password (for extra security).
+	<br>
+	For password protected notes, to delete them you must enter your account password again.
+	<br>
+	If %d password checks are failed, your account will be locked for %d minutes.
+	<br>
+	<br>
+	This is my (Harnam Saggu) first big project, hope you enjoy
 </html>

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-public class StartFrame extends JPanel implements ActionListener, KeyListener {
+class StartFrame extends JPanel implements ActionListener, KeyListener {
    JFrame jFrame;
    JButton loginButton, newUserButton;
    JTextField usernameTextField;
@@ -19,7 +19,7 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
 
    int failCount;
 
-   public StartFrame() {
+   StartFrame() {
       super();
       initComponents();
    }
@@ -85,28 +85,11 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
       jFrame.setVisible(true);
    }
 
-   public void close() {
-      if (jFrame != null) {
-         jFrame.dispose();
-         dbConnection.close();
-      }
-   }
-
-   @Override
-   public void actionPerformed(ActionEvent e) {
-      if (e.getSource() == loginButton) {
-         checkLoginDetails();
-      } else if (e.getSource() == newUserButton) {
-         close();
-         new CreateUserFrame();
-      }
-   }
-
    void checkLoginDetails() {
       String username = usernameTextField.getText();
-      System.out.println(username);
+//      System.out.println(username);
       char[] password = passwordTextField.getPassword();
-      System.out.println(password);
+//      System.out.println(password);
       if (password.length == 0 || password.length >= 256) {
          setErrorMsg("Enter your login details");
          return;
@@ -119,34 +102,20 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
                resultSet = dbConnection.selectTimeout(username);
                if (resultSet.next()) {
                   String timeout = resultSet.getString("timeout");
-                  System.out.println(timeout);
+//                  System.out.println(timeout);
 
                   if (timeout == null) {
                      UserData.username = username;
                      UserData.password = password;
-                        close();
-                        new SecureNotes();
+                     close();
+                     new SecureNotes();
                   } else {
                      String currentDateTime = DateTime.getDateTime();
-                     System.out.println(currentDateTime);
-
                      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                      LocalDateTime localTimeout = LocalDateTime.parse(timeout, formatter);
                      assert currentDateTime != null;
                      LocalDateTime localCurrent = LocalDateTime.parse(currentDateTime, formatter);
-
-                     System.out.println(localTimeout);
-                     System.out.println(localCurrent);
-
-//                     Duration duration = Duration.between(localTimeout, localCurrent);
-//                     long minutesSince = duration.toMinutes();
-
-//                     long minutesSince = localCurrent.getMinute() - localTimeout.getMinute();
-
                      long minutesSince = ChronoUnit.MINUTES.between(localTimeout, localCurrent);
-
-                     System.out.println(minutesSince);
-
                      if (minutesSince >= Constants.TIMEOUT_DURATION) {
                         dbConnection.nullifyTimeout(username);
 
@@ -196,6 +165,23 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
          UserData.block();
 
          errorMessageLabel.setText("You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
+      }
+   }
+
+   void close() {
+      if (jFrame != null) {
+         jFrame.dispose();
+         dbConnection.close();
+      }
+   }
+
+   @Override
+   public void actionPerformed(ActionEvent e) {
+      if (e.getSource() == loginButton) {
+         checkLoginDetails();
+      } else if (e.getSource() == newUserButton) {
+         close();
+         new CreateUserFrame();
       }
    }
 

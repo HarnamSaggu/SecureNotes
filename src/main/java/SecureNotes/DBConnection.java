@@ -2,7 +2,7 @@ package SecureNotes;
 
 import java.sql.*;
 
-public class DBConnection {
+class DBConnection {
    static final String CONNECTION_STRING = "jdbc:mysql://localhost:3306/secure_notes";
    static final String USER = "user1";
    static final String PASSWORD = "password";
@@ -23,7 +23,7 @@ public class DBConnection {
    PreparedStatement deleteNote;
    PreparedStatement selectId;
 
-   public DBConnection() {
+   DBConnection() {
       if (UserData.blockRequest) {
          return;
       }
@@ -32,8 +32,8 @@ public class DBConnection {
          conn = DriverManager.getConnection(CONNECTION_STRING, USER, PASSWORD);
 
          selectPassword = conn.prepareStatement("SELECT hashed_password FROM users WHERE username = ?;");
-         insertUser = conn.prepareStatement("INSERT INTO users (username, hashed_password, filepath) VALUES (?, ?, ?);");
-         updateUser = conn.prepareStatement("UPDATE users SET username = ?, hashed_password = ?, filepath = ? WHERE username = ?;");
+         insertUser = conn.prepareStatement("INSERT INTO users (username, hashed_password) VALUES (?, ?);");
+         updateUser = conn.prepareStatement("UPDATE users SET username = ?, hashed_password = ? WHERE username = ?;");
          deleteUser = conn.prepareStatement("DELETE FROM users WHERE username = ?;");
          updateTimeout = conn.prepareStatement("UPDATE users SET timeout = ? WHERE username = ?;");
          selectTimeout = conn.prepareStatement("SELECT timeout FROM users WHERE username = ?;");
@@ -49,7 +49,7 @@ public class DBConnection {
       }
    }
 
-   public ResultSet selectUser(String a) throws SQLException {
+   ResultSet selectUser(String a) throws SQLException {
       if (UserData.blockRequest) {
          return null;
       }
@@ -59,7 +59,7 @@ public class DBConnection {
       return resultSet;
    }
 
-   public void updateUser(String a, String b, String c, String d) throws SQLException {
+   void updateUser(String a, String b, String c) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
@@ -67,22 +67,20 @@ public class DBConnection {
       updateUser.setString(1, a);
       updateUser.setString(2, b);
       updateUser.setString(3, c);
-      updateUser.setString(4, d);
       updateUser.executeUpdate();
    }
 
-   public void insertUser(String a, String b, String c) throws SQLException {
+   void insertUser(String a, String b) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
 
       insertUser.setString(1, a);
       insertUser.setString(2, b);
-      insertUser.setString(3, c);
       insertUser.executeUpdate();
    }
 
-   public void deleteUser(String a) throws SQLException {
+   void deleteUser(String a) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
@@ -91,7 +89,7 @@ public class DBConnection {
       deleteUser.executeUpdate();
    }
 
-   public void updateTimeout(String a, String b) throws SQLException {
+   void updateTimeout(String a, String b) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
@@ -101,7 +99,7 @@ public class DBConnection {
       updateTimeout.executeUpdate();
    }
 
-   public ResultSet selectTimeout(String a) throws SQLException {
+   ResultSet selectTimeout(String a) throws SQLException {
       if (UserData.blockRequest) {
          return null;
       }
@@ -111,7 +109,7 @@ public class DBConnection {
       return resultSet;
    }
 
-   public void nullifyTimeout(String a) throws SQLException {
+   void nullifyTimeout(String a) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
@@ -120,7 +118,7 @@ public class DBConnection {
       nullifyTimeout.executeUpdate();
    }
 
-   public ResultSet selectNotes(String a) throws SQLException {
+   ResultSet selectNotes(String a) throws SQLException {
       if (UserData.blockRequest) {
          return null;
       }
@@ -130,7 +128,7 @@ public class DBConnection {
       return resultSet;
    }
 
-   public void insertNote(String a, String b, String c, String d) throws SQLException {
+   void insertNote(String a, String b, String c, String d) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
@@ -142,7 +140,7 @@ public class DBConnection {
       insertNote.executeUpdate();
    }
 
-   public void updateNote(String a, String b, String c, String d, int e) throws SQLException {
+   void updateNote(String a, String b, String c, String d, int e) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
@@ -155,7 +153,7 @@ public class DBConnection {
       updateNote.executeUpdate();
    }
 
-   public ResultSet selectId(String a) throws SQLException {
+   ResultSet selectId(String a) throws SQLException {
       if (UserData.blockRequest) {
          return null;
       }
@@ -165,7 +163,7 @@ public class DBConnection {
       return resultSet;
    }
 
-   public void deleteNote(int a) throws SQLException {
+   void deleteNote(int a) throws SQLException {
       if (UserData.blockRequest) {
          return;
       }
@@ -174,8 +172,7 @@ public class DBConnection {
       deleteNote.executeUpdate();
    }
 
-   public void close() {
-      System.out.println("DELETE THIS - CLOSING CONNECTION");
+   void close() {
       try {
          resultSet.close();
       } catch (Exception e) { /* Ignored */ }

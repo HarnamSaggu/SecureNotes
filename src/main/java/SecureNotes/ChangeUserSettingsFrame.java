@@ -3,23 +3,24 @@ package SecureNotes;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
 class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListener {
    JFrame jFrame;
-   JButton changeSettingsButton, choosePathButton;
-   JTextField usernameTextField, pathTextField;
+   JButton changeSettingsButton;
+   JTextField usernameTextField;
    JPasswordField passwordTextField, passwordMatchTextField;
-   JLabel messageLabel, l1, l2, l3, l4;
-   JFileChooser fileChooser;
+   JLabel messageLabel, l1, l2, l3;
 
    DBConnection dbConnection;
 
-   ChangeUserSettingsFrame() {
+   CallbackEvent callbackEvent;
+
+   ChangeUserSettingsFrame(CallbackEvent callbackEvent) {
       super();
+      this.callbackEvent = callbackEvent;
       initComponents();
    }
 
@@ -38,7 +39,7 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
       jFrame.setLayout(new BorderLayout());
       jFrame.setIconImage(Constants.ICON);
       jFrame.setResizable(false);
-      jFrame.setSize(600, 180);
+      jFrame.setSize(600, 150);
       jFrame.setLocationRelativeTo(null);
 
       setLayout(null);
@@ -77,27 +78,9 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
       passwordMatchTextField.addKeyListener(this);
       add(passwordMatchTextField);
 
-      l4 = new JLabel("<html>Note<br>Folder</html>");
-      l4.setFont(Constants.FONT);
-      l4.setBounds(10, 83, 150, 30);
-      add(l4);
-
-      pathTextField = new JTextField("C:\\");
-      pathTextField.setFont(Constants.FONT);
-      pathTextField.setBounds(80, 81, 460, 18);
-      pathTextField.addKeyListener(this);
-      add(pathTextField);
-
-      choosePathButton = new JButton("...");
-      choosePathButton.setFont(Constants.FONT);
-      choosePathButton.setBounds(545, 81, 30, 18);
-      choosePathButton.setBackground(Constants.BUTTON_COLOR);
-      choosePathButton.addActionListener(this);
-      add(choosePathButton);
-
       changeSettingsButton = new JButton("Change settings");
       changeSettingsButton.setFont(Constants.FONT);
-      changeSettingsButton.setBounds(10, 116, 564, 18);
+      changeSettingsButton.setBounds(10, 84, 564, 18);
       changeSettingsButton.setBackground(Constants.BUTTON_COLOR);
       changeSettingsButton.addActionListener(this);
       changeSettingsButton.addKeyListener(this);
@@ -116,34 +99,29 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
       if (usernameStr.length() > 0 && usernameStr.length() < 256) {
          if (passwordStr.length > 0 && passwordStr.length < 256) {
             if (Arrays.equals(passwordStr, passwordMatchStr)) {
-               File folder = new File(pathTextField.getText());
-               if (folder.exists() && folder.isDirectory()) {
-                  try {
-                     ResultSet resultSet = dbConnection.selectUser(usernameStr);
-                     System.out.println(UserData.username + ", " + usernameStr + ", " + UserData.username.equals(usernameStr));
-                     if (usernameStr.equals(UserData.username)) resultSet.next();
-                     if (!resultSet.next()) {
-                        System.out.println(usernameStr);
-                        System.out.println(passwordStr);
-                        System.out.println(pathTextField.getText());
-                        System.out.println();
+               try {
+                  ResultSet resultSet = dbConnection.selectUser(usernameStr);
+//                  System.out.println(UserData.username + ", " + usernameStr + ", " + UserData.username.equals(usernameStr));
+                  if (usernameStr.equals(UserData.username)) resultSet.next();
+                  if (!resultSet.next()) {
+//                     System.out.println(usernameStr);
+//                     System.out.println(passwordStr);
+//                     System.out.println();
 
-                        try {
-                           dbConnection.updateUser(usernameStr, Crypt.hash(new String(passwordStr)), pathTextField.getText(), UserData.username);
-                           UserData.username = usernameStr;
-                           UserData.password = passwordStr;
-                           setMessage("Settings changed successfully");
-                        } catch (SQLException e) {
-                           e.printStackTrace();
-                        }
-                     } else {
-                        setMessage("Username taken");
+                     try {
+                        dbConnection.updateUser(usernameStr, Crypt.hash(new String(passwordStr)), UserData.username);
+                        UserData.username = usernameStr;
+                        UserData.password = passwordStr;
+                        callbackEvent.doEvent();
+                        setMessage("Settings changed successfully");
+                     } catch (SQLException e) {
+                        e.printStackTrace();
                      }
-                  } catch (SQLException e) {
-                     e.printStackTrace();
+                  } else {
+                     setMessage("Username taken");
                   }
-               } else {
-                  setMessage("Note folder location is invalid");
+               } catch (SQLException e) {
+                  e.printStackTrace();
                }
             } else {
                setMessage("Passwords don't match");
@@ -158,35 +136,18 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
 
    void setMessage(String msg) {
       if (messageLabel == null) {
-         jFrame.setSize(600, 200);
+         jFrame.setSize(600, 166);
          messageLabel = new JLabel();
          messageLabel.setFont(Constants.FONT);
-         messageLabel.setBounds(10, 116, 564, 18);
+         messageLabel.setBounds(10, 81, 564, 18);
          add(messageLabel);
-         changeSettingsButton.setBounds(10, 136, 564, 18);
+         changeSettingsButton.setBounds(10, 100, 564, 18);
       }
 
       messageLabel.setText(msg);
    }
 
-   void choosePath() {
-      fileChooser = new JFileChooser();
-      fileChooser.setCurrentDirectory(new java.io.File("C:/"));
-      fileChooser.setDialogTitle("Choose notes folder");
-      fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      fileChooser.setAcceptAllFileFilterUsed(false);
-
-      if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-         String pathStr = fileChooser.getSelectedFile().getPath();
-         if (!(pathStr.endsWith("\\") || pathStr.endsWith("/"))) {
-            if (pathStr.contains("\\")) pathStr += "\\";
-            else if (pathStr.contains("/")) pathStr += "/";
-         }
-         pathTextField.setText(pathStr);
-      }
-   }
-
-   public void close() {
+   void close() {
       if (jFrame != null) {
          jFrame.dispose();
          dbConnection.close();
@@ -195,11 +156,7 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
 
    @Override
    public void actionPerformed(ActionEvent e) {
-      if (e.getSource() == changeSettingsButton) {
-         changeUserSettings();
-      } else {
-         choosePath();
-      }
+      changeUserSettings();
    }
 
    @Override

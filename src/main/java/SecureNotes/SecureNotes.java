@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 import static java.awt.event.KeyEvent.*;
 
-public class SecureNotes extends JPanel implements ActionListener, KeyListener, MouseListener {
+class SecureNotes extends JPanel implements ActionListener, KeyListener, MouseListener {
    JFrame jFrame;
    JList<String> titleList;
    JScrollPane titleScroll;
@@ -36,7 +36,7 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
 
    DBConnection dbConnection;
 
-   public SecureNotes() {
+   SecureNotes() {
       super();
       initComponents();
    }
@@ -78,7 +78,7 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       newNote.addActionListener(this);
       file.add(newNote);
 
-      deleteNote = new JMenuItem("Delete selected note(s)");
+      deleteNote = new JMenuItem("Delete note currently displayed");
       deleteNote.setFont(Constants.FONT);
       deleteNote.setMnemonic(VK_D);
       deleteNote.addActionListener(this);
@@ -114,7 +114,7 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
 
       deleteUser = new JMenuItem("Delete user");
       deleteUser.setFont(Constants.FONT);
-      deleteUser.setMnemonic(VK_E);
+      deleteUser.setMnemonic(VK_D);
       deleteUser.addActionListener(this);
       settings.add(deleteUser);
 
@@ -126,7 +126,6 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       titleList.addKeyListener(new KeyAdapter() {
          @Override
          public void keyPressed(KeyEvent e) {
-            System.out.println(titleList.getSelectedIndex());
             if (e.getKeyCode() == VK_DELETE && titleList.getSelectedIndex() > 0) {
                deleteNote();
             }
@@ -196,15 +195,42 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       try {
          ResultSet resultSet = dbConnection.selectNotes(UserData.username);
          while (resultSet.next()) {
-            notes.add(new Note(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), Crypt.decrypt(resultSet.getString(4), new String(UserData.password))));
-            titles.addElement(resultSet.getString(2));
+            String decTitle = Crypt.decrypt(resultSet.getString(2), new String(UserData.password));
+            String decBody = Crypt.decrypt(resultSet.getString(3), new String(UserData.password));
+            String decPassword = Crypt.decrypt(resultSet.getString(4), new String(UserData.password));
+            notes.add(new Note(resultSet.getInt(1), decTitle, decBody, decPassword));
+            titles.addElement(decTitle);
          }
       } catch (SQLException e) {
          dbConnection.close();
       }
+
+      for (int i = 0; i < notes.size(); i++) {
+         if (notes.get(i).password == null) {
+            showNote(++i);
+            break;
+         }
+      }
+
+      if (shownNote == -1) {
+         titleBar.setEnabled(false);
+         bodyPane.setEnabled(false);
+         indvPasswordBar.setEnabled(false);
+         save.setEnabled(false);
+      }
    }
 
    void showNote(int index) {
+      titleBar.setEnabled(true);
+      bodyPane.setEnabled(true);
+      indvPasswordBar.setEnabled(true);
+      save.setEnabled(true);
+
+      if (shownNote > 0) {
+         notes.set(shownNote - 1, new Note(notes.get(shownNote - 1).id, titleBar.getText(), bodyPane.getText(), new String(indvPasswordBar.getPassword()).length() == 0 ? null : new String(indvPasswordBar.getPassword())));
+      }
+
+
       String title = titles.getElementAt(index--);
       String body = notes.get(index).body;
       String password = notes.get(index).password;
@@ -237,15 +263,18 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       showNote(notes.size());
    }
 
-   void saveNote() {
+   void saveNote(int shownNote) {
       if (shownNote == 0) return;
 
       titleList.setSelectedIndex(shownNote);
       int index = shownNote - 1;
-      System.out.println(notes.get(index));
-      System.out.println(notes.get(shownNote - 1));
       Note note = notes.get(index);
       Note newNote = new Note(note.id, titleBar.getText(), bodyPane.getText(), new String(indvPasswordBar.getPassword()).length() == 0 ? null : new String(indvPasswordBar.getPassword()));
+
+      if (newNote.title.length() == 0 || newNote.title.length() >= 256) {
+         new TextDialog("Title length error", "Title has to be 1 to 255 characters long");
+         return;
+      }
 
       if (note.id == 0) {
          boolean titleTaken = false;
@@ -260,7 +289,10 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
             return;
          } else {
             try {
-               dbConnection.insertNote(UserData.username, newNote.title, newNote.body, Crypt.encrypt(newNote.password, new String(UserData.password)));
+               String encTitle = Crypt.encrypt(newNote.title, UserData.password);
+               String encBody = Crypt.encrypt(newNote.body, UserData.password);
+               String encPassword = Crypt.encrypt(newNote.password, UserData.password);
+               dbConnection.insertNote(UserData.username, encTitle, encBody, encPassword);
                ResultSet resultSet = dbConnection.selectId(UserData.username);
                resultSet.next();
                newNote.id = resultSet.getInt(1);
@@ -272,7 +304,10 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
          }
       } else {
          try {
-            dbConnection.updateNote(UserData.username, newNote.title, newNote.body, Crypt.encrypt(newNote.password, new String(UserData.password)), newNote.id);
+            String encTitle = Crypt.encrypt(newNote.title, UserData.password);
+            String encBody = Crypt.encrypt(newNote.body, UserData.password);
+            String encPassword = Crypt.encrypt(newNote.password, UserData.password);
+            dbConnection.updateNote(UserData.username, encTitle, encBody, encPassword, newNote.id);
          } catch (SQLException e) {
             e.printStackTrace();
             new TextDialog("Note not saved", "Note failed to save correctly: Check connection and try again");
@@ -289,17 +324,28 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
          return;
       }
 
-      try {
-         dbConnection.deleteNote(notes.get(shownNote - 1).id);
+      CallbackEvent delete = () -> {
+         if (notes.get(shownNote - 1).id != 0) {
+            try {
+               dbConnection.deleteNote(notes.get(shownNote - 1).id);
+            } catch (SQLException e) {
+               e.printStackTrace();
+               new TextDialog("Not deleted", "Note failed to delete, check connection");
+            }
+         }
 
          notes.remove(shownNote - 1);
          titles.removeElementAt(shownNote);
-      } catch (SQLException e) {
-         e.printStackTrace();
+      };
+
+      if (notes.get(shownNote - 1).password == null) {
+         delete.doEvent();
+      } else {
+         new EnterPasswordFrame(UserData.password, delete);
       }
    }
 
-   public void close() {
+   void close() {
       if (jFrame != null) {
          jFrame.dispose();
          dbConnection.close();
@@ -337,11 +383,17 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
          } catch (FileNotFoundException ex) {
             ex.printStackTrace();
          }
-         new TextDialog("About", aboutFile.toString());
+         new TextDialog("About", String.format(aboutFile.toString(), Constants.MAX_ATTEMPT, Constants.TIMEOUT_DURATION));
       } else if (component == userSettings) {
-         new EnterPasswordFrame(UserData.password, () -> new ChangeUserSettingsFrame());
+         new EnterPasswordFrame(UserData.password, () -> new ChangeUserSettingsFrame(() -> {
+            for (int i = 0; i < notes.size(); i++) {
+               if (notes.get(i).id != 0) {
+                  saveNote(i + 1);
+               }
+            }
+         }));
       } else if (component == save) {
-         saveNote();
+         saveNote(shownNote);
       } else if (component == deleteUser) {
          new EnterPasswordFrame(UserData.password, () -> new DeleteUserFrame(this::close));
       }

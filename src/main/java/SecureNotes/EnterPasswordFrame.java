@@ -4,15 +4,14 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.Arrays;
 
-public class EnterPasswordFrame extends JPanel implements ActionListener, KeyListener {
+class EnterPasswordFrame extends JPanel implements ActionListener, KeyListener {
+   final char[] password;
+   final CallbackEvent event;
    JFrame jFrame;
    JButton loginButton;
    JPasswordField passwordField;
 
-   final char[] password;
-   final CallbackEvent event;
-
-   public EnterPasswordFrame(char[] password, CallbackEvent event) {
+   EnterPasswordFrame(char[] password, CallbackEvent event) {
       super();
       this.password = password;
       this.event = event;
@@ -59,21 +58,14 @@ public class EnterPasswordFrame extends JPanel implements ActionListener, KeyLis
 
       jFrame.setVisible(true);
 
-      UserData.addCallbackEvent(() -> {
-         new TextDialog("Locked out", "You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
-      });
+      UserData.addCallbackEvent(() -> new TextDialog("Locked out", "You have been locked out for " + Constants.TIMEOUT_DURATION + " mins"));
    }
 
-   public void close() {
+   void close() {
       if (jFrame != null) {
          jFrame.dispose();
          UserData.removeCallbackEvent();
       }
-   }
-
-   @Override
-   public void actionPerformed(ActionEvent e) {
-      checkDetails();
    }
 
    void checkDetails() {
@@ -83,6 +75,11 @@ public class EnterPasswordFrame extends JPanel implements ActionListener, KeyLis
          UserData.incrementStrikes();
       }
       close();
+   }
+
+   @Override
+   public void actionPerformed(ActionEvent e) {
+      checkDetails();
    }
 
    @Override
