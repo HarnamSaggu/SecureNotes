@@ -7,20 +7,21 @@ public class DBConnection {
    static final String USER = "user1";
    static final String PASSWORD = "password";
 
-   Connection conn = null;
-   ResultSet resultSet = null;
+   Connection conn;
+   ResultSet resultSet;
 
-   PreparedStatement selectPassword = null;
-   PreparedStatement insertUser = null;
-   PreparedStatement updateUser = null;
-   PreparedStatement deleteUser = null;
-   PreparedStatement updateTimeout = null;
-   PreparedStatement selectTimeout = null;
-   PreparedStatement nullifyTimeout = null;
-   PreparedStatement selectNotes = null;
-   PreparedStatement insertNote = null;
-   PreparedStatement updateNote = null;
-   PreparedStatement selectId = null;
+   PreparedStatement selectPassword;
+   PreparedStatement insertUser;
+   PreparedStatement updateUser;
+   PreparedStatement deleteUser;
+   PreparedStatement updateTimeout;
+   PreparedStatement selectTimeout;
+   PreparedStatement nullifyTimeout;
+   PreparedStatement selectNotes;
+   PreparedStatement insertNote;
+   PreparedStatement updateNote;
+   PreparedStatement deleteNote;
+   PreparedStatement selectId;
 
    public DBConnection() {
       if (UserData.blockRequest) {
@@ -40,6 +41,7 @@ public class DBConnection {
          selectNotes = conn.prepareStatement("SELECT id, title, body, password FROM notes WHERE username = ?;");
          insertNote = conn.prepareStatement("INSERT INTO notes (username, title, body, password) VALUES (?, ?, ?, ?);");
          updateNote = conn.prepareStatement("UPDATE notes SET username = ?, title = ?, body = ?, password = ? WHERE id = ?;");
+         deleteNote = conn.prepareStatement("DELETE FROM notes WHERE id = ?;");
          selectId = conn.prepareStatement("SELECT id FROM notes WHERE username = ?;");
       } catch (SQLException ex) {
          ex.printStackTrace();
@@ -163,6 +165,15 @@ public class DBConnection {
       return resultSet;
    }
 
+   public void deleteNote(int a) throws SQLException {
+      if (UserData.blockRequest) {
+         return;
+      }
+
+      deleteNote.setInt(1, a);
+      deleteNote.executeUpdate();
+   }
+
    public void close() {
       System.out.println("DELETE THIS - CLOSING CONNECTION");
       try {
@@ -197,6 +208,9 @@ public class DBConnection {
       } catch (Exception e) { /* Ignored */ }
       try {
          updateNote.close();
+      } catch (Exception e) { /* Ignored */ }
+      try {
+         deleteNote.close();
       } catch (Exception e) { /* Ignored */ }
       try {
          selectId.close();

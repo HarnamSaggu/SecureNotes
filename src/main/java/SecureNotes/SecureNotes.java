@@ -32,7 +32,7 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
    DefaultListModel<String> titles;
    List<Note> notes;
    ArrayList<Integer> strikes;
-   int selectedIndex;
+   int shownNote = -1;
 
    DBConnection dbConnection;
 
@@ -120,11 +120,6 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
 
       titles = new DefaultListModel<>();
       titles.addElement("* New Note *");
-      // test titles
-//      addNote("Todo #1", "* Cry", "");
-//      addNote("Shopping", "* Eggs\n* Bread\n* 2 Children", "");
-//      addNote("Product idea", "A portable monitor (A4 size) 1080p resolution.\nHas a plastic cover plate which has mousepad felt on the inside", "password");
-      //------------
       titleList = new JList<>(titles);
       titleList.setFont(Constants.FONT);
       titleList.setFixedCellHeight(20);
@@ -207,115 +202,7 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       } catch (SQLException e) {
          dbConnection.close();
       }
-
-//      UserData.lockedOutEvent = () -> {
-//         about.setEnabled(false);
-//         bodyPane.setEnabled(false);
-//         deleteNote.setEnabled(false);
-//         deleteUser.setEnabled(false);
-//         indvPasswordBar.setEnabled(false);
-//         keybindings.setEnabled(false);
-//         newNote.setEnabled(false);
-//         save.setEnabled(false);
-//         saveAs.setEnabled(false);
-//         titleBar.setEnabled(false);
-//         userSettings.setEnabled(false);
-//      };
-
-//      if (titles.size() <= 1)
-//         createNewNote();
-
-//      showNote(1);
-
-//      new SwingWorker<>() {
-//         @Override
-//         protected Object doInBackground() {
-//            List<Note> toAdd = NoteIO.getAllFiles(UserData.FILEPATH);
-//            for (Note note : toAdd) {
-//               titles.addElement(note.title);
-//               notes.add(note);
-//            }
-//            return null;
-//         }
-//      }.execute();
-
-//      NoteIO.list(InfoHolder.FILEPATH).forEach(System.out::println);
-//      notes = NoteIO.getAllFiles(InfoHolder.FILEPATH);
    }
-
-//   void showNote(int titleListIndex) {
-//      if (InfoHolder.blockRequest) return;
-//
-//      if (strikes.get(titleListIndex - 1) == 3) {
-//         InfoHolder.blockRequest = true;
-//         return;
-//      }
-//
-//      char[] password = notes.get(titleListIndex - 1).password;
-//
-//      if (password.length == 0) {
-//         titleBar.setText(titles.getElementAt(titleListIndex));
-//         bodyPane.setText(notes.get(--titleListIndex).body);
-//         indvPasswordBar.setText(String.valueOf(notes.get(titleListIndex).password));
-//         return;
-//      }
-//
-//      int finalTitleListIndex = titleListIndex;
-//      new SwingWorker<>() {
-//         @Override
-//         protected Object doInBackground() {
-//            var npf = new NotePasswordFrame();
-//            char[] notePassword = npf.run();
-//            System.out.println(notePassword);
-//            if (Arrays.equals(notePassword, password)) {
-//               titleBar.setText(titles.getElementAt(finalTitleListIndex));
-//               bodyPane.setText(notes.get(finalTitleListIndex - 1).body);
-//               indvPasswordBar.setText(String.valueOf(notes.get(finalTitleListIndex - 1).password));
-//               strikes.set(finalTitleListIndex - 1, 0);
-//            } else {
-//               strikes.set(finalTitleListIndex - 1, strikes.get(finalTitleListIndex - 1) + 1);
-//            }
-//            return null;
-//         }
-//      }.execute();
-//
-//      System.out.println(strikes.get(titleListIndex - 1));
-//   }
-//
-//   void addNote(String title, String body, String password) {
-//      titles.addElement(title);
-//      notes.add(new Note(title, body, password));
-//      strikes.add(0);
-//   }
-//
-//   void createNewNote() {
-//      if (InfoHolder.blockRequest) return;
-//      addNote("[Untitled note]", "", "");
-//
-//      titleList.setSelectedIndex(notes.size());
-//      showNote(notes.size());
-//   }
-//
-//   void deleteNote() {
-//      int index = titleList.getSelectedIndex() - 1;
-//      if (index == -1) return;
-//      titles.removeElementAt(index + 1);
-//      notes.remove(index);
-//      strikes.remove(index);
-//
-//      titleBar.setText("");
-//      bodyPane.setText("");
-//      indvPasswordBar.setText("");
-//   }
-//
-//   void saveNote() {
-//      int index = titleList.getSelectedIndex() - 1;
-//      if (index == -1) return;
-//      titles.setElementAt(titleBar.getText(), index + 1);
-//      notes.set(index, new Note(titleBar.getText(), bodyPane.getText(), indvPasswordBar.getPassword(), notes.get(index).filepath));
-//
-//      // TODO: 29/08/2021 UPDATE FILE
-//   }
 
    void showNote(int index) {
       String title = titles.getElementAt(index--);
@@ -327,8 +214,8 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
          bodyPane.setText(body);
          indvPasswordBar.setText("");
 
-         selectedIndex = index;
-         titleList.setSelectedIndex(selectedIndex + 1);
+         shownNote = index + 1;
+         titleList.setSelectedIndex(shownNote);
          return;
       }
 
@@ -338,8 +225,9 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
          bodyPane.setText(body);
          indvPasswordBar.setText(password);
 
-         selectedIndex = finalIndex;
-         titleList.setSelectedIndex(selectedIndex + 1);
+
+         shownNote = finalIndex + 1;
+         titleList.setSelectedIndex(shownNote);
       });
    }
 
@@ -349,20 +237,18 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       showNote(notes.size());
    }
 
-   void saveNote(int index) {
-      System.out.println(index);
-      System.out.println(selectedIndex - 1);
+   void saveNote() {
+      if (shownNote == 0) return;
+
+      titleList.setSelectedIndex(shownNote);
+      int index = shownNote - 1;
+      System.out.println(notes.get(index));
+      System.out.println(notes.get(shownNote - 1));
       Note note = notes.get(index);
-      Note newNote = new Note(note.id, titleBar.getText(), bodyPane.getText(), new String(indvPasswordBar.getPassword()));
+      Note newNote = new Note(note.id, titleBar.getText(), bodyPane.getText(), new String(indvPasswordBar.getPassword()).length() == 0 ? null : new String(indvPasswordBar.getPassword()));
 
       if (note.id == 0) {
          boolean titleTaken = false;
-//         for (Note other : notes) {
-//            if (other.title.equals(note.title)) {
-//               titleTaken = true;
-//               break;
-//            }
-//         }
          for (int i = 0; i < notes.size(); i++) {
             if (notes.get(i).title.equals(newNote.title) && i != index) {
                titleTaken = true;
@@ -399,7 +285,18 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
    }
 
    void deleteNote() {
-      System.out.println(notes.get(selectedIndex));
+      if (shownNote == 0) {
+         return;
+      }
+
+      try {
+         dbConnection.deleteNote(notes.get(shownNote - 1).id);
+
+         notes.remove(shownNote - 1);
+         titles.removeElementAt(shownNote);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
    }
 
    public void close() {
@@ -414,7 +311,7 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       Object component = e.getSource();
 
       if (component == newNote) {
-//         createNewNote();
+         createNote();
       } else if (component == deleteNote) {
          deleteNote();
       } else if (component == keybindings) {
@@ -444,10 +341,9 @@ public class SecureNotes extends JPanel implements ActionListener, KeyListener, 
       } else if (component == userSettings) {
          new EnterPasswordFrame(UserData.password, () -> new ChangeUserSettingsFrame());
       } else if (component == save) {
-         if (titleList.getSelectedIndex() == 0) return;
-         saveNote(titleList.getSelectedIndex() - 1);
+         saveNote();
       } else if (component == deleteUser) {
-         new EnterPasswordFrame(UserData.password, () -> new DeleteUserFrame());
+         new EnterPasswordFrame(UserData.password, () -> new DeleteUserFrame(this::close));
       }
    }
 

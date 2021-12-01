@@ -10,9 +10,9 @@ public class EnterPasswordFrame extends JPanel implements ActionListener, KeyLis
    JPasswordField passwordField;
 
    final char[] password;
-   final PasswordEvent event;
+   final CallbackEvent event;
 
-   public EnterPasswordFrame(char[] password, PasswordEvent event) {
+   public EnterPasswordFrame(char[] password, CallbackEvent event) {
       super();
       this.password = password;
       this.event = event;
@@ -58,11 +58,16 @@ public class EnterPasswordFrame extends JPanel implements ActionListener, KeyLis
       add(loginButton);
 
       jFrame.setVisible(true);
+
+      UserData.addCallbackEvent(() -> {
+         new TextDialog("Locked out", "You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
+      });
    }
 
    public void close() {
       if (jFrame != null) {
          jFrame.dispose();
+         UserData.removeCallbackEvent();
       }
    }
 
@@ -73,7 +78,7 @@ public class EnterPasswordFrame extends JPanel implements ActionListener, KeyLis
 
    void checkDetails() {
       if (Arrays.equals(password, passwordField.getPassword())) {
-         event.ifCorrect();
+         event.doEvent();
       } else {
          UserData.incrementStrikes();
       }

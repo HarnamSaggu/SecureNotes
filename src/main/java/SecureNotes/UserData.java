@@ -1,17 +1,31 @@
 package SecureNotes;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserData {
+   static final int MAX_ATTEMPT = 7;
+
    static String username;
    static char[] password;
    static boolean blockRequest = false;
    static int strikes = 0;
 
+   static List<CallbackEvent> callbackEvents = new ArrayList<>();
+
+   static void addCallbackEvent(CallbackEvent callbackEvent) {
+      callbackEvents.add(callbackEvent);
+   }
+
+   static void removeCallbackEvent() {
+      callbackEvents.remove(0);
+   }
+
    static void incrementStrikes() {
       strikes++;
 
-      if (strikes == 3) {
+      if (strikes == MAX_ATTEMPT) {
          block();
       }
    }
@@ -29,6 +43,10 @@ public class UserData {
       password = null;
       blockRequest = true;
 
-      new TextDialog("Locked out", "You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
+      for (CallbackEvent callbackEvent : callbackEvents) {
+         callbackEvent.doEvent();
+      }
+
+//      new TextDialog("Locked out", "You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
    }
 }

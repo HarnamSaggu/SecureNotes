@@ -14,8 +14,11 @@ public class DeleteUserFrame extends JPanel implements ActionListener {
 
    DBConnection dbConnection;
 
-   public DeleteUserFrame() {
+   CallbackEvent callbackEvent;
+
+   public DeleteUserFrame(CallbackEvent callbackEvent) {
       super();
+      this.callbackEvent = callbackEvent;
       initComponents();
    }
 
@@ -73,15 +76,17 @@ public class DeleteUserFrame extends JPanel implements ActionListener {
    public void actionPerformed(ActionEvent e) {
       if (e.getSource() == yes) {
          if (UserData.blockRequest) {
-            JOptionPane.showMessageDialog(jFrame, "Your account has already been deleted");
-         }
-
-         try {
-            dbConnection.deleteUser(UserData.username);
-            UserData.blockRequest = true;
-            close();
-         } catch (SQLException ex) {
-            ex.printStackTrace();
+            new TextDialog("Secure notes", "Either your account has already been deleted or you are locked out");
+            callbackEvent.doEvent();
+         } else {
+            try {
+               dbConnection.deleteUser(UserData.username);
+               UserData.block();
+               callbackEvent.doEvent();
+               close();
+            } catch (SQLException ex) {
+               ex.printStackTrace();
+            }
          }
       } else if (e.getSource() == no) {
          close();

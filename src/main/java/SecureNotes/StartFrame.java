@@ -192,9 +192,8 @@ public class StartFrame extends JPanel implements ActionListener, KeyListener {
          } catch (SQLException e) {
             e.printStackTrace();
          }
-         UserData.blockRequest = true;
-         UserData.username = null;
-         UserData.password = null;
+
+         UserData.block();
 
          errorMessageLabel.setText("You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
       }
