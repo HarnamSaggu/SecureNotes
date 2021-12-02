@@ -96,11 +96,6 @@ class CreateUserFrame extends JPanel implements ActionListener, KeyListener {
                try {
                   ResultSet resultSet = dbConnection.selectUser(usernameStr);
                   if (!resultSet.next()) {
-//                     System.out.println(usernameStr);
-//                     System.out.println(passwordStr);
-//                     System.out.println(passwordMatchStr);
-//                     System.out.println();
-
                      try {
                         dbConnection.insertUser(usernameStr, Crypt.hash(new String(passwordStr)));
                         close();

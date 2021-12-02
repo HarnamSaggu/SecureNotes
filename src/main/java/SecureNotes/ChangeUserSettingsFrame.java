@@ -99,13 +99,8 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
             if (Arrays.equals(passwordStr, passwordMatchStr)) {
                try {
                   ResultSet resultSet = dbConnection.selectUser(usernameStr);
-//                  System.out.println(UserData.username + ", " + usernameStr + ", " + UserData.username.equals(usernameStr));
                   if (usernameStr.equals(UserData.username)) resultSet.next();
                   if (!resultSet.next()) {
-//                     System.out.println(usernameStr);
-//                     System.out.println(passwordStr);
-//                     System.out.println();
-
                      try {
                         dbConnection.updateUser(usernameStr, Crypt.hash(new String(passwordStr)), UserData.username);
                         UserData.username = usernameStr;

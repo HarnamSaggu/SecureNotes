@@ -90,9 +90,7 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
       }
 
       String username = usernameTextField.getText();
-//      System.out.println(username);
       char[] password = passwordTextField.getPassword();
-//      System.out.println(new String(password));
       if (password.length == 0 || password.length >= 256) {
          setErrorMsg("Enter your login details");
          return;
@@ -105,8 +103,6 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
                resultSet = dbConnection.selectTimeout(username);
                if (resultSet.next()) {
                   String timeout = resultSet.getString("timeout");
-//                  System.out.println(timeout);
-
                   if (timeout == null) {
                      UserData.username = username;
                      UserData.password = password;
