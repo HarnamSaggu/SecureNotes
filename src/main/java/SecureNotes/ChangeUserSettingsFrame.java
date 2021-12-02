@@ -26,7 +26,6 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
 
    void initComponents() {
       jFrame = new JFrame("Secure notes");
-
       jFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       jFrame.addWindowListener(new WindowAdapter() {
          @Override
@@ -35,7 +34,6 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
             dbConnection.close();
          }
       });
-
       jFrame.setLayout(new BorderLayout());
       jFrame.setIconImage(Constants.ICON);
       jFrame.setResizable(false);

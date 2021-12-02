@@ -23,7 +23,6 @@ class CreateUserFrame extends JPanel implements ActionListener, KeyListener {
 
    void initComponents() {
       jFrame = new JFrame("Secure notes");
-
       jFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       jFrame.addWindowListener(new WindowAdapter() {
          @Override
@@ -31,7 +30,6 @@ class CreateUserFrame extends JPanel implements ActionListener, KeyListener {
             close();
          }
       });
-
       jFrame.setLayout(new BorderLayout());
       jFrame.setIconImage(Constants.ICON);
       jFrame.setResizable(false);

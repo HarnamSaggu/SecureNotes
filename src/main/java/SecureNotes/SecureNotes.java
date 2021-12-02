@@ -46,7 +46,6 @@ class SecureNotes extends JPanel implements ActionListener, KeyListener, MouseLi
       strikes = new ArrayList<>();
 
       jFrame = new JFrame("Secure notes");
-
       jFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       jFrame.addWindowListener(new WindowAdapter() {
          @Override
@@ -55,7 +54,6 @@ class SecureNotes extends JPanel implements ActionListener, KeyListener, MouseLi
             dbConnection.close();
          }
       });
-
       jFrame.setLayout(new BorderLayout(3, 3));
       jFrame.setIconImage(Constants.ICON);
 
