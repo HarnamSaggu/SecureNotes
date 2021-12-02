@@ -29,6 +29,7 @@ class DateTime {
          }
       } catch (UnknownHostException e) {
          e.printStackTrace();
+         new TextDialog("Connection", "Check your connection and try again");
       }
       return null;
    }

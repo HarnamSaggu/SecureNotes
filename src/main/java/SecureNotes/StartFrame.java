@@ -84,10 +84,15 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
    }
 
    void checkLoginDetails() {
+      String currentDateTime = DateTime.getDateTime();
+      if (currentDateTime == null) {
+         return;
+      }
+
       String username = usernameTextField.getText();
 //      System.out.println(username);
       char[] password = passwordTextField.getPassword();
-//      System.out.println(password);
+//      System.out.println(new String(password));
       if (password.length == 0 || password.length >= 256) {
          setErrorMsg("Enter your login details");
          return;
@@ -108,10 +113,8 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
                      close();
                      new SecureNotes();
                   } else {
-                     String currentDateTime = DateTime.getDateTime();
                      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                      LocalDateTime localTimeout = LocalDateTime.parse(timeout, formatter);
-                     assert currentDateTime != null;
                      LocalDateTime localCurrent = LocalDateTime.parse(currentDateTime, formatter);
                      long minutesSince = ChronoUnit.MINUTES.between(localTimeout, localCurrent);
                      if (minutesSince >= Constants.TIMEOUT_DURATION) {

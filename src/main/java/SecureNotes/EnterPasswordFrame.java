@@ -67,6 +67,10 @@ class EnterPasswordFrame extends JPanel implements ActionListener, KeyListener {
    }
 
    void checkDetails() {
+      if (DateTime.getDateTime() == null) {
+         return;
+      }
+
       if (Arrays.equals(password, passwordField.getPassword())) {
          event.doEvent();
       } else {
