@@ -7,7 +7,7 @@ Hire me :) pls.
 
 I did this entire project at 15 (turing 16 quite soon tho).
 It took a few months due to long gaps inbetween.
-The back-end as painful as it was, was all in all quite cool.
+The back-end as painful as it was, was all in all quite cool and fun.
 I hate front-end and so took a break after completing it.
 I will add features to this project but under a diffrent repository.
 
