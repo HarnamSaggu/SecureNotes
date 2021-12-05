@@ -11,4 +11,5 @@ The back-end as painful as it was, was all in all quite cool.
 I hate front-end and so took a break after completing it.
 I will add features to this project but under a diffrent repository.
 
-I would have built a .jar but after hours of trying every conciable pom.xml and my deadline was nearing so :p
+I would have built a .jar but after hours of trying every conciable pom.xml nothing worked :(
+And my deadline was nearing so :p
