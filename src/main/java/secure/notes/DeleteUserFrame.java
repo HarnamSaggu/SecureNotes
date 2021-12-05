@@ -1,4 +1,4 @@
-package SecureNotes;
+package secure.notes;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -10,8 +10,10 @@ import java.sql.SQLException;
 class DeleteUserFrame extends JPanel implements ActionListener {
    final CallbackEvent callbackEvent;
    JFrame jFrame;
-   JLabel msg;
-   JButton yes, no;
+   JLabel messageLabel;
+   JButton yesButton;
+   JButton noButton;
+
    DBConnection dbConnection;
 
    DeleteUserFrame(CallbackEvent callbackEvent) {
@@ -22,7 +24,7 @@ class DeleteUserFrame extends JPanel implements ActionListener {
 
    void initComponents() {
       jFrame = new JFrame("Secure notes");
-      jFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
       jFrame.addWindowListener(new WindowAdapter() {
          @Override
          public void windowClosing(WindowEvent e) {
@@ -37,24 +39,24 @@ class DeleteUserFrame extends JPanel implements ActionListener {
       setLayout(null);
       jFrame.add(this);
 
-      msg = new JLabel("<html>Are you sure you would like to delete your account?<br>This cannot be undone</html>");
-      msg.setFont(Constants.BOLD_FONT);
-      msg.setBounds(20, 10, 470, 40);
-      add(msg);
+      messageLabel = new JLabel("<html>Are you sure you would like to delete your account?<br>This cannot be undone</html>");
+      messageLabel.setFont(Constants.BOLD_FONT);
+      messageLabel.setBounds(20, 10, 470, 40);
+      add(messageLabel);
 
-      yes = new JButton("Yes");
-      yes.setFont(Constants.FONT);
-      yes.setBackground(Constants.BUTTON_COLOR);
-      yes.setBounds(10, 280, 230, 20);
-      yes.addActionListener(this);
-      add(yes);
+      yesButton = new JButton("Yes");
+      yesButton.setFont(Constants.FONT);
+      yesButton.setBackground(Constants.BUTTON_COLOR);
+      yesButton.setBounds(10, 280, 230, 20);
+      yesButton.addActionListener(this);
+      add(yesButton);
 
-      no = new JButton("No");
-      no.setFont(Constants.FONT);
-      no.setBackground(Constants.BUTTON_COLOR);
-      no.setBounds(248, 280, 230, 20);
-      no.addActionListener(this);
-      add(no);
+      noButton = new JButton("No");
+      noButton.setFont(Constants.FONT);
+      noButton.setBackground(Constants.BUTTON_COLOR);
+      noButton.setBounds(248, 280, 230, 20);
+      noButton.addActionListener(this);
+      add(noButton);
 
       dbConnection = new DBConnection();
 
@@ -70,13 +72,13 @@ class DeleteUserFrame extends JPanel implements ActionListener {
 
    @Override
    public void actionPerformed(ActionEvent e) {
-      if (e.getSource() == yes) {
-         if (UserData.blockRequest) {
+      if (e.getSource() == yesButton) {
+         if (UserData.isBlocked()) {
             new TextDialog("Secure notes", "Either your account has already been deleted or you are locked out");
             callbackEvent.doEvent();
          } else {
             try {
-               dbConnection.deleteUser(UserData.username);
+               dbConnection.deleteUser(UserData.getUsername());
                UserData.block();
                callbackEvent.doEvent();
                close();
@@ -84,7 +86,7 @@ class DeleteUserFrame extends JPanel implements ActionListener {
                ex.printStackTrace();
             }
          }
-      } else if (e.getSource() == no) {
+      } else if (e.getSource() == noButton) {
          close();
       }
    }

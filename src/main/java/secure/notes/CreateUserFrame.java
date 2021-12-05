@@ -1,4 +1,4 @@
-package SecureNotes;
+package secure.notes;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,31 +7,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListener {
+class CreateUserFrame extends JPanel implements ActionListener, KeyListener {
    JFrame jFrame;
-   JButton changeSettingsButton;
+   JButton newUserButton;
    JTextField usernameTextField;
-   JPasswordField passwordTextField, passwordMatchTextField;
-   JLabel messageLabel, l1, l2, l3;
+   JPasswordField passwordTextField;
+   JPasswordField passwordMatchTextField;
+   JLabel messageLabel;
 
    DBConnection dbConnection;
 
-   CallbackEvent callbackEvent;
-
-   ChangeUserSettingsFrame(CallbackEvent callbackEvent) {
+   CreateUserFrame() {
       super();
-      this.callbackEvent = callbackEvent;
       initComponents();
    }
 
    void initComponents() {
       jFrame = new JFrame("Secure notes");
-      jFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
       jFrame.addWindowListener(new WindowAdapter() {
          @Override
          public void windowClosing(WindowEvent e) {
             close();
-            dbConnection.close();
          }
       });
       jFrame.setLayout(new BorderLayout());
@@ -43,17 +40,17 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
       setLayout(null);
       jFrame.add(this, BorderLayout.CENTER);
 
-      l1 = new JLabel("Username");
+      JLabel l1 = new JLabel("Username");
       l1.setFont(Constants.FONT);
       l1.setBounds(10, 10, 150, 20);
       add(l1);
 
-      l2 = new JLabel("Password");
+      JLabel l2 = new JLabel("Password");
       l2.setFont(Constants.FONT);
       l2.setBounds(10, 30, 150, 20);
       add(l2);
 
-      l3 = new JLabel("<html>Re-enter<br>Password</html>");
+      JLabel l3 = new JLabel("<html>Re-enter<br>Password</html>");
       l3.setFont(Constants.FONT);
       l3.setBounds(10, 50, 150, 30);
       add(l3);
@@ -76,54 +73,50 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
       passwordMatchTextField.addKeyListener(this);
       add(passwordMatchTextField);
 
-      changeSettingsButton = new JButton("Change settings");
-      changeSettingsButton.setFont(Constants.FONT);
-      changeSettingsButton.setBounds(10, 84, 564, 18);
-      changeSettingsButton.setBackground(Constants.BUTTON_COLOR);
-      changeSettingsButton.addActionListener(this);
-      changeSettingsButton.addKeyListener(this);
-      add(changeSettingsButton);
+      newUserButton = new JButton("Create new user");
+      newUserButton.setFont(Constants.FONT);
+      newUserButton.setBounds(10, 84, 564, 18);
+      newUserButton.setBackground(Constants.BUTTON_COLOR);
+      newUserButton.addActionListener(this);
+      newUserButton.addKeyListener(this);
+      add(newUserButton);
 
       dbConnection = new DBConnection();
 
       jFrame.setVisible(true);
    }
 
-   void changeUserSettings() {
+   void createNewUser() {
       String usernameStr = usernameTextField.getText();
       char[] passwordStr = passwordTextField.getPassword();
       char[] passwordMatchStr = passwordMatchTextField.getPassword();
 
-      if (usernameStr.length() > 0 && usernameStr.length() < 256) {
-         if (passwordStr.length > 0 && passwordStr.length < 256) {
-            if (Arrays.equals(passwordStr, passwordMatchStr)) {
-               try {
-                  ResultSet resultSet = dbConnection.selectUser(usernameStr);
-                  if (usernameStr.equals(UserData.username)) resultSet.next();
-                  if (!resultSet.next()) {
-                     try {
-                        dbConnection.updateUser(usernameStr, Crypt.hash(new String(passwordStr)), UserData.username);
-                        UserData.username = usernameStr;
-                        UserData.password = passwordStr;
-                        callbackEvent.doEvent();
-                        setMessage("Settings changed successfully");
-                     } catch (SQLException e) {
-                        e.printStackTrace();
-                     }
-                  } else {
-                     setMessage("Username taken");
-                  }
-               } catch (SQLException e) {
-                  e.printStackTrace();
-               }
-            } else {
-               setMessage("Passwords don't match");
-            }
-         } else {
-            setMessage("Password must be between 1 and 255 characters");
-         }
-      } else {
+      if (usernameStr.length() == 0 || usernameStr.length() > 255) {
          setMessage("Username must be between 1 and 255 characters");
+         return;
+      }
+      if (passwordStr.length == 0 || passwordStr.length > 255) {
+         setMessage("Password must be between 1 and 255 characters");
+         return;
+      }
+      if (!Arrays.equals(passwordMatchStr, passwordStr)) {
+         setMessage("Passwords don't match");
+         return;
+      }
+
+      try {
+         ResultSet resultSet = dbConnection.selectPassword(usernameStr);
+         if (!resultSet.next()) {
+            dbConnection.insertUser(usernameStr, Crypt.hash(new String(passwordStr)));
+            close();
+            UserData.setUsername(usernameStr);
+            UserData.setPassword(passwordStr);
+            new SecureNotes();
+         } else {
+            setMessage("Username taken");
+         }
+      } catch (SQLException e) {
+         e.printStackTrace();
       }
    }
 
@@ -134,9 +127,11 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
          messageLabel.setFont(Constants.FONT);
          messageLabel.setBounds(10, 81, 564, 18);
          add(messageLabel);
-         changeSettingsButton.setBounds(10, 100, 564, 18);
+         newUserButton.setBounds(10, 100, 564, 18);
       }
 
+      passwordTextField.setText("");
+      passwordMatchTextField.setText("");
       messageLabel.setText(msg);
    }
 
@@ -149,23 +144,23 @@ class ChangeUserSettingsFrame extends JPanel implements ActionListener, KeyListe
 
    @Override
    public void actionPerformed(ActionEvent e) {
-      changeUserSettings();
+      createNewUser();
    }
 
    @Override
    public void keyTyped(KeyEvent e) {
-
+      // Unused listener method
    }
 
    @Override
    public void keyPressed(KeyEvent e) {
       if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-         changeUserSettings();
+         createNewUser();
       }
    }
 
    @Override
    public void keyReleased(KeyEvent e) {
-
+      // Unused listener method
    }
 }

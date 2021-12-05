@@ -1,4 +1,4 @@
-package SecureNotes;
+package secure.notes;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -22,7 +22,7 @@ class TextDialog extends JPanel implements KeyListener {
    void initComponents() {
       jFrame = new JFrame(title);
       jFrame.setIconImage(Constants.ICON);
-      jFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      jFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
       jFrame.addKeyListener(this);
 
       setLayout(new BorderLayout(5, 5));
@@ -35,12 +35,12 @@ class TextDialog extends JPanel implements KeyListener {
       l1.addKeyListener(this);
       add(l1, BorderLayout.CENTER);
 
-      JButton ok = new JButton("Ok");
-      ok.setFont(Constants.FONT);
-      ok.setBackground(Constants.BUTTON_COLOR);
-      ok.addActionListener(e -> jFrame.dispose());
-      ok.addKeyListener(this);
-      add(ok, BorderLayout.SOUTH);
+      JButton okButton = new JButton("Ok");
+      okButton.setFont(Constants.FONT);
+      okButton.setBackground(Constants.BUTTON_COLOR);
+      okButton.addActionListener(e -> jFrame.dispose());
+      okButton.addKeyListener(this);
+      add(okButton, BorderLayout.SOUTH);
 
       jFrame.pack();
       jFrame.setMinimumSize(jFrame.getSize());
@@ -50,7 +50,7 @@ class TextDialog extends JPanel implements KeyListener {
 
    @Override
    public void keyTyped(KeyEvent e) {
-
+      // Unused listener method
    }
 
    @Override
@@ -62,6 +62,6 @@ class TextDialog extends JPanel implements KeyListener {
 
    @Override
    public void keyReleased(KeyEvent e) {
-
+      // Unused listener method
    }
 }

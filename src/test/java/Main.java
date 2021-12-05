@@ -1,7 +1,7 @@
-import SecureNotes.LaunchSecureNotes;
+import secure.notes.LaunchSecureNotes;
 
 public class Main {
    public static void main(String[] args) {
-      LaunchSecureNotes.launch();
+      LaunchSecureNotes secureNotes = LaunchSecureNotes.getInstance();
    }
 }

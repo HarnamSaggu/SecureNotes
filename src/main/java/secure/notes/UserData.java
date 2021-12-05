@@ -1,15 +1,19 @@
-package SecureNotes;
+package secure.notes;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 class UserData {
-   static final List<CallbackEvent> callbackEvents = new ArrayList<>();
-   static String username;
-   static char[] password;
-   static boolean blockRequest = false;
-   static int strikes = 0;
+   private static final List<CallbackEvent> callbackEvents = new ArrayList<>();
+   private static String username;
+   private static char[] password;
+   private static boolean blockRequest = false;
+   private static int strikes = 0;
+
+   private UserData() {
+      throw new IllegalStateException("Utility class");
+   }
 
    static void addCallbackEvent(CallbackEvent callbackEvent) {
       callbackEvents.add(callbackEvent);
@@ -43,7 +47,25 @@ class UserData {
       for (CallbackEvent callbackEvent : callbackEvents) {
          callbackEvent.doEvent();
       }
+   }
 
-//      new TextDialog("Locked out", "You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
+   public static synchronized String getUsername() {
+      return username;
+   }
+
+   public static synchronized void setUsername(String username) {
+      UserData.username = username;
+   }
+
+   public static synchronized char[] getPassword() {
+      return password;
+   }
+
+   public static synchronized void setPassword(char[] password) {
+      UserData.password = password;
+   }
+
+   public static synchronized boolean isBlocked() {
+      return blockRequest;
    }
 }

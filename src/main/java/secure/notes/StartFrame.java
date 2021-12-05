@@ -1,4 +1,4 @@
-package SecureNotes;
+package secure.notes;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -10,14 +10,13 @@ import java.time.temporal.ChronoUnit;
 
 class StartFrame extends JPanel implements ActionListener, KeyListener {
    JFrame jFrame;
-   JButton loginButton, newUserButton;
+   JButton loginButton;
+   JButton newUserButton;
    JTextField usernameTextField;
    JPasswordField passwordTextField;
-   JLabel errorMessageLabel;
+   JLabel messageLabel;
 
    DBConnection dbConnection;
-
-   int failCount;
 
    StartFrame() {
       super();
@@ -26,7 +25,7 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
 
    void initComponents() {
       jFrame = new JFrame("Secure notes");
-      jFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
       jFrame.addWindowListener(new WindowAdapter() {
          @Override
          public void windowClosing(WindowEvent e) {
@@ -91,78 +90,66 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
 
       String username = usernameTextField.getText();
       char[] password = passwordTextField.getPassword();
-      if (password.length == 0 || password.length >= 256) {
-         setErrorMsg("Enter your login details");
+
+      if (password.length == 0 || password.length > 255) {
+         setMessage("Enter your login details");
          return;
       }
-      try {
-         ResultSet resultSet = dbConnection.selectUser(username);
-         if (resultSet.next()) {
-            String returnedPassword = resultSet.getString("hashed_password");
-            if (Crypt.hashMatches(new String(password), returnedPassword)) {
-               resultSet = dbConnection.selectTimeout(username);
-               if (resultSet.next()) {
-                  String timeout = resultSet.getString("timeout");
-                  if (timeout == null) {
-                     UserData.username = username;
-                     UserData.password = password;
-                     close();
-                     new SecureNotes();
-                  } else {
-                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                     LocalDateTime localTimeout = LocalDateTime.parse(timeout, formatter);
-                     LocalDateTime localCurrent = LocalDateTime.parse(currentDateTime, formatter);
-                     long minutesSince = ChronoUnit.MINUTES.between(localTimeout, localCurrent);
-                     if (minutesSince >= Constants.TIMEOUT_DURATION) {
-                        dbConnection.nullifyTimeout(username);
 
-                        UserData.username = username;
-                        UserData.password = password;
-                        close();
-                        new SecureNotes();
-                     } else {
-                        setErrorMsg("You have been locked out: " + (45L - minutesSince) + " min(s)");
-                     }
-                  }
-               }
+      try {
+         ResultSet resultSet = dbConnection.selectPassword(username);
+
+         if (!resultSet.next()) {
+            setMessage("Invalid username/password");
+            return;
+         }
+
+         String returnedPassword = resultSet.getString("hashed_password");
+         if (!Crypt.hashMatches(new String(password), returnedPassword)) {
+            setMessage("Invalid username/password");
+            UserData.incrementStrikes();
+            return;
+         }
+
+         resultSet = dbConnection.selectTimeout(username);
+         resultSet.next();
+         String timeout = resultSet.getString("timeout");
+         if (timeout != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime localTimeout = LocalDateTime.parse(timeout, formatter);
+            LocalDateTime localCurrent = LocalDateTime.parse(currentDateTime, formatter);
+            long minutesSince = ChronoUnit.MINUTES.between(localTimeout, localCurrent);
+            if (minutesSince >= Constants.TIMEOUT_DURATION) {
+               dbConnection.nullifyTimeout(username);
             } else {
-               failCount++;
-               setErrorMsg("Invalid username/password");
+               setMessage("You have been locked out: " + (45L - minutesSince) + " min(s)");
+               return;
             }
-         } else {
-            setErrorMsg("Invalid username/password");
+
+            UserData.setUsername(username);
+            UserData.setPassword(password);
+            close();
+            new SecureNotes();
          }
       } catch (SQLException e) {
          e.printStackTrace();
       }
    }
 
-   void setErrorMsg(String msg) {
+   void setMessage(String msg) {
       passwordTextField.setText("");
 
-      if (errorMessageLabel == null) {
-         errorMessageLabel = new JLabel();
-         errorMessageLabel.setFont(Constants.FONT);
-         errorMessageLabel.setBounds(10, 51, 564, 18);
-         add(errorMessageLabel);
+      if (messageLabel == null) {
+         messageLabel = new JLabel();
+         messageLabel.setFont(Constants.FONT);
+         messageLabel.setBounds(10, 51, 564, 18);
+         add(messageLabel);
          loginButton.setBounds(10, 71, 564, 18);
          newUserButton.setBounds(10, 91, 564, 18);
          jFrame.setSize(600, 155);
       }
 
-      errorMessageLabel.setText(msg);
-
-      if (failCount == 3) {
-         try {
-            dbConnection.updateTimeout(DateTime.getDateTime(), UserData.username);
-         } catch (SQLException e) {
-            e.printStackTrace();
-         }
-
-         UserData.block();
-
-         errorMessageLabel.setText("You have been locked out for " + Constants.TIMEOUT_DURATION + " mins");
-      }
+      messageLabel.setText(msg);
    }
 
    void close() {
@@ -184,7 +171,7 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
 
    @Override
    public void keyTyped(KeyEvent e) {
-
+      // Unused listener method
    }
 
    @Override
@@ -196,6 +183,6 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
 
    @Override
    public void keyReleased(KeyEvent e) {
-
+      // Unused listener method
    }
 }

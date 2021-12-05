@@ -1,4 +1,4 @@
-package SecureNotes;
+package secure.notes;
 
 import java.util.Objects;
 

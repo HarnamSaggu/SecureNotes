@@ -1,4 +1,4 @@
-package SecureNotes;
+package secure.notes;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,5 +26,9 @@ class Constants {
       } catch (IOException | FontFormatException e) {
          e.printStackTrace();
       }
+   }
+
+   private Constants() {
+      throw new IllegalStateException("Utility class");
    }
 }

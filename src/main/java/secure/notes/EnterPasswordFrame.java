@@ -1,4 +1,4 @@
-package SecureNotes;
+package secure.notes;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -16,11 +16,12 @@ class EnterPasswordFrame extends JPanel implements ActionListener, KeyListener {
       this.password = password;
       this.event = event;
       initComponents();
+      UserData.addCallbackEvent(() -> new TextDialog("Locked out", "You have been locked out for " + Constants.TIMEOUT_DURATION + " mins"));
    }
 
    void initComponents() {
       jFrame = new JFrame("Secure notes");
-      jFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
       jFrame.addWindowListener(new WindowAdapter() {
          @Override
          public void windowClosing(WindowEvent e) {
@@ -55,8 +56,6 @@ class EnterPasswordFrame extends JPanel implements ActionListener, KeyListener {
       add(loginButton);
 
       jFrame.setVisible(true);
-
-      UserData.addCallbackEvent(() -> new TextDialog("Locked out", "You have been locked out for " + Constants.TIMEOUT_DURATION + " mins"));
    }
 
    void close() {
@@ -86,7 +85,7 @@ class EnterPasswordFrame extends JPanel implements ActionListener, KeyListener {
 
    @Override
    public void keyTyped(KeyEvent e) {
-
+      // Unused listener method
    }
 
    @Override
@@ -98,6 +97,6 @@ class EnterPasswordFrame extends JPanel implements ActionListener, KeyListener {
 
    @Override
    public void keyReleased(KeyEvent e) {
-
+      // Unused listener method
    }
 }
