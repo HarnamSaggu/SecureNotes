@@ -15,12 +15,15 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
    JTextField usernameTextField;
    JPasswordField passwordTextField;
    JLabel messageLabel;
-
    DBConnection dbConnection;
 
    StartFrame() {
       super();
       initComponents();
+   }
+
+   public static void main(String[] args) {
+      new StartFrame();
    }
 
    void initComponents() {
@@ -98,7 +101,6 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
 
       try {
          ResultSet resultSet = dbConnection.selectPassword(username);
-
          if (!resultSet.next()) {
             setMessage("Invalid username/password");
             return;
@@ -125,12 +127,11 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
                setMessage("You have been locked out: " + (45L - minutesSince) + " min(s)");
                return;
             }
-
-            UserData.setUsername(username);
-            UserData.setPassword(password);
-            close();
-            new SecureNotes();
          }
+         UserData.setUsername(username);
+         UserData.setPassword(password);
+         close();
+         new SecureNotes();
       } catch (SQLException e) {
          e.printStackTrace();
       }
@@ -153,10 +154,8 @@ class StartFrame extends JPanel implements ActionListener, KeyListener {
    }
 
    void close() {
-      if (jFrame != null) {
-         jFrame.dispose();
-         dbConnection.close();
-      }
+      jFrame.dispose();
+      dbConnection.close();
    }
 
    @Override
